@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavi Personalizados — Catálogo Dia das Mães</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bege: #FAF7F2;
+    --rose: #C9847A;
+    --rose-light: #E8B4AF;
+    --rose-dark: #A86560;
+    --navy: #1E2D5A;
+    --navy-light: #2E4080;
+    --cream: #F2EDE6;
+    --text: #2C2C2C;
+    --text-light: #7A7A7A;
+    --white: #FFFFFF;
+    --shadow: rgba(201,132,122,0.15);
+    --shadow-dark: rgba(30,45,90,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--bege);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid rgba(201,132,122,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px var(--shadow);
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--rose);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .cart-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.25s;
+    position: relative;
+  }
+
+  .cart-btn:hover { background: var(--navy-light); transform: translateY(-1px); }
+
+  .cart-count {
+    background: var(--rose);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    display: none;
+  }
+
+  .cart-count.show { display: flex; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 50%, #3D5A9E 100%);
+    color: white;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(201,132,122,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(201,132,122,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: var(--rose);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.15;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--rose-light);
+  }
+
+  .hero p {
+    font-size: 15px;
+    opacity: 0.8;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* FILTERS */
+  .filters-section {
+    background: var(--white);
+    border-bottom: 1px solid rgba(201,132,122,0.15);
+    position: sticky;
+    top: 72px;
+    z-index: 90;
+  }
+
+  .filters-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    height: 56px;
+    align-items: center;
+  }
+
+  .filters-inner::-webkit-scrollbar { display: none; }
+
+  .filter-btn {
+    white-space: nowrap;
+    padding: 7px 18px;
+    border-radius: 50px;
+    border: 1.5px solid rgba(201,132,122,0.3);
+    background: transparent;
+    color: var(--text-light);
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--rose);
+    color: var(--rose);
+  }
+
+  .filter-btn.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: white;
+  }
+
+  /* PRODUCTS GRID */
+  .products-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(201,132,122,0.3), transparent);
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  /* PRODUCT CARD */
+  .product-card {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px var(--shadow-dark);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(201,132,122,0.25);
+  }
+
+  .product-card.hidden { display: none; }
+
+  .product-img {
+    aspect-ratio: 1;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--rose);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 50px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .product-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-category {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--rose);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .product-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+
+  .product-desc {
+    font-size: 12px;
+    color: var(--text-light);
+    line-height: 1.5;
+    flex: 1;
+    margin-bottom: 14px;
+  }
+
+  .product-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .product-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .product-price-from {
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: 400;
+  }
+
+  .add-btn {
+    width: 100%;
+    background: var(--rose);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .add-btn:hover { background: var(--rose-dark); transform: translateY(-1px); }
+  .add-btn:active { transform: translateY(0); }
+
+  /* CART SIDEBAR */
+  .cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
+  }
+
+  .cart-overlay.open { opacity: 1; pointer-events: all; }
+
+  .cart-sidebar {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: min(420px, 100vw);
+    background: var(--white);
+    z-index: 201;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 48px rgba(0,0,0,0.15);
+  }
+
+  .cart-sidebar.open { transform: translateX(0); }
+
+  .cart-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(201,132,122,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bege);
+  }
+
+  .cart-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  .close-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--navy);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px var(--shadow-dark);
+  }
+
+  .close-btn:hover { background: var(--rose); color: white; }
+
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cart-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+  }
+
+  .cart-empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+  .cart-empty p {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .cart-empty small { font-size: 13px; }
+
+  .cart-item {
+    background: var(--bege);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .cart-item-icon {
+    width: 48px; height: 48px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+  .cart-item-info { flex: 1; min-width: 0; }
+
+  .cart-item-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--navy);
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  .cart-item-variant {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .cart-item-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .qty-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(201,132,122,0.4);
+    background: white;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: var(--navy);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .qty-btn:hover { background: var(--rose); border-color: var(--rose); color: white; }
+
+  .qty-display { font-size: 14px; font-weight: 700; color: var(--navy); min-width: 20px; text-align: center; }
+
+  .cart-item-price { font-weight: 700; font-size: 14px; color: var(--rose-dark); }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    font-size: 16px;
+    padding: 4px;
+    transition: color 0.2s;
+    margin-left: 4px;
+  }
+
+  .remove-btn:hover { color: #E53E3E; }
+
+  /* CART FOOTER */
+  .cart-footer {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(201,132,122,0.15);
+    background: var(--bege);
+  }
+
+  .cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .cart-total-label {
+    font-size: 13px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+
+  .cart-total-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .checkout-btn {
+    width: 100%;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 24px;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.3px;
+  }
+
+  .checkout-btn:hover { background: #1EB854; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(37,211,102,0.35); }
+
+  .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .whatsapp-icon { font-size: 20px; }
+
+  .cart-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  /* MODAL for product variants */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    backdrop-filter: blur(3px);
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--white);
+    border-radius: 20px;
+    max-width: 420px;
+    width: 100%;
+    padding: 28px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+    transform: translateY(20px) scale(0.98);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+  .modal-icon { font-size: 40px; margin-bottom: 12px; }
+
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .modal-category {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--rose);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .variant-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .variant-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .variant-opt {
+    padding: 8px 16px;
+    border: 1.5px solid rgba(201,132,122,0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    background: var(--bege);
+    color: var(--text);
+  }
+
+  .variant-opt:hover { border-color: var(--rose); color: var(--rose); }
+  .variant-opt.selected { border-color: var(--navy); background: var(--navy); color: white; }
+
+  .variant-opt .opt-price {
+    font-weight: 700;
+    display: block;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .modal-cancel {
+    flex: 1;
+    padding: 12px;
+    border: 1.5px solid rgba(201,132,122,0.3);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-light);
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modal-cancel:hover { border-color: var(--rose); color: var(--rose); }
+
+  .modal-add {
+    flex: 2;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: var(--rose);
+    color: white;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modal-add:hover { background: var(--rose-dark); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--navy);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 500;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(30,45,90,0.3);
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  footer strong { color: white; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .hero { padding: 40px 20px; }
+    .product-name { font-size: 13px; }
+    .product-price { font-size: 17px; }
+  }
+
+  @media (max-width: 380px) {
+    .products-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-name">lavi</span>
+      <span class="logo-sub">personalizados</span>
+    </div>
+    <button class="cart-btn" onclick="toggleCart()">
+      🛒 Carrinho
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">🌸 Dia das Mães 2025</div>
+  <h1>Presentes feitos<br>com <em>muito amor</em></h1>
+  <p>Produtos personalizados para tornar essa data ainda mais especial. Escolha, adicione ao carrinho e finalize pelo WhatsApp!</p>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-section">
+  <div class="filters-inner">
+    <button class="filter-btn active" onclick="filterProducts('todos', this)">✨ Todos</button>
+    <button class="filter-btn" onclick="filterProducts('quadros', this)">🖼️ Quadros & Fotos</button>
+    <button class="filter-btn" onclick="filterProducts('azulejos', this)">🏠 Azulejos</button>
+    <button class="filter-btn" onclick="filterProducts('canecas', this)">☕ Canecas & Bebidas</button>
+    <button class="filter-btn" onclick="filterProducts('utilidades', this)">🎁 Utilidades</button>
+    <button class="filter-btn" onclick="filterProducts('lembranças', this)">💝 Lembranças</button>
+    <button class="filter-btn" onclick="filterProducts('chocolates', this)">🍫 Chocolates & Cards</button>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<section class="products-section">
+  <h2 class="section-title" id="sectionTitle">Todos os produtos</h2>
+  <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Lavi Personalizados</strong><br>
+  📍 Marília, SP &nbsp;|&nbsp; 📦 Entregamos em toda Marília e Região<br>
+  ✉️ Enviamos para todo o Brasil via Correios<br>
+  <br>
+  Pagamento via PIX, transferência ou cartão (link de pagamento)
+</footer>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <span class="cart-title">🛒 Meu carrinho</span>
+    <button class="close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🛍️</div>
+      <p>Carrinho vazio</p>
+      <small>Adicione produtos para começar!</small>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total estimado</span>
+      <span class="cart-total-value" id="cartTotal">R$ 0,00</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="finalizarPedido()" disabled>
+      <span class="whatsapp-icon">💬</span>
+      Finalizar pelo WhatsApp
+    </button>
+    <p class="cart-note">Você será redirecionada ao WhatsApp com o resumo do seu pedido</p>
+  </div>
+</div>
+
+<!-- MODAL VARIANTES -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-icon" id="modalIcon"></div>
+    <div class="modal-category" id="modalCategory"></div>
+    <h3 id="modalName"></h3>
+    <div id="modalVariantsContainer"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-add" onclick="addFromModal()">Adicionar ao carrinho</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Produto adicionado!</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.7/umd/supabase.min.js"></script>
+<script>
+// =====================
+// SUPABASE CONFIG
+// ⚠️ Substitua com suas credenciais
+// =====================
+const SUPABASE_URL = 'https://jylvdownsghgjsxbqfxs.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_PmHqYJtwfovvVe79pUEWNA_eLFdHiBb';
+
+let sb;
+try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
+
+// =====================
+// PRODUTOS DATA (fallback estático — será substituído pelo Supabase)
+// =====================
+const products_fallback = [
+  // QUADROS & FOTOS
+  { id:1, name:"Quadro Personalizado", category:"quadros", icon:"🖼️", desc:"Arte exclusiva com suas fotos. Escolha a arte e o tamanho ideal.", badge:"Personalizado",
+    variants:[
+      {label:"Arte 1–9 — 15x21cm", price:42.90},
+      {label:"Arte 1–9 — 20x30cm", price:62.90},
+      {label:"Arte 1–9 — 30x40cm", price:82.90}
+    ]
+  },
+  { id:2, name:"Porta Retrato", category:"quadros", icon:"🪞", desc:"Porta retrato 15x21cm, elegante e personalizado.", badge:null,
+    variants:[{label:"15x21cm", price:59.90}]
+  },
+  { id:3, name:"Porta Retrato Coração", category:"quadros", icon:"💗", desc:"Porta retrato no formato coração, delicado e especial.", badge:null,
+    variants:[{label:"Único", price:29.90}]
+  },
+  { id:4, name:"Foto de Mesa", category:"quadros", icon:"📸", desc:"Foto personalizada para decorar a mesa com muito amor.", badge:null,
+    variants:[
+      {label:"Com flor", price:28.00},
+      {label:"Sem flor", price:22.00}
+    ]
+  },
+  { id:5, name:"Polaroid de Mesa", category:"quadros", icon:"📷", desc:"Polaroid de mesa, estilo moderno e fofo para decoração.", badge:"Novo",
+    variants:[{label:"Único", price:25.00}]
+  },
+  { id:6, name:"Varal Polaroid", category:"quadros", icon:"🎞️", desc:"Varal com fotos polaroid 12x16cm — decoração especial!", badge:null,
+    variants:[{label:"12x16cm", price:39.90}]
+  },
+  { id:7, name:"Cubo Fotográfico", category:"quadros", icon:"🎲", desc:"Cubo acrílico com 6 fotos, 6,2x6,2cm. Presente único!", badge:"Especial",
+    variants:[{label:"6 fotos — 6,2x6,2cm", price:39.90}]
+  },
+  // AZULEJOS
+  { id:8, name:"Azulejo Personalizado", category:"azulejos", icon:"🏡", desc:"Azulejo com foto/frase ou com ilustração exclusiva. Consulte modelos.", badge:null,
+    variants:[
+      {label:"15x15cm — Com foto/frase", price:42.90},
+      {label:"15x15cm — Com ilustração", price:57.90},
+      {label:"20x20cm — Com foto/frase", price:49.90},
+      {label:"20x20cm — Com ilustração", price:64.90},
+      {label:"10x15cm", price:39.90},
+      {label:"10x20cm", price:42.90},
+      {label:"10x30cm", price:49.90}
+    ]
+  },
+  { id:9, name:"Porta Chaves com Azulejo", category:"azulejos", icon:"🔑", desc:"Porta chaves com azulejo personalizado — presentão!", badge:"Premium",
+    variants:[
+      {label:"Com foto/frase", price:69.90},
+      {label:"Com ilustração", price:84.90}
+    ]
+  },
+  // CANECAS & BEBIDAS
+  { id:10, name:"Caneca Personalizada", category:"canecas", icon:"☕", desc:"Caneca de cerâmica personalizada com foto, arte ou mensagem.", badge:null,
+    variants:[{label:"Padrão", price:34.90}]
+  },
+  { id:11, name:"Xícara Personalizada", category:"canecas", icon:"🫖", desc:"Xícara delicada personalizada com foto ou arte.", badge:null,
+    variants:[{label:"Padrão", price:34.90}]
+  },
+  { id:12, name:"Xícara com Coador", category:"canecas", icon:"🍵", desc:"Xícara personalizada com coador — presente completo para quem ama café.", badge:"Especial",
+    variants:[{label:"Conjunto", price:54.90}]
+  },
+  { id:13, name:"Caneca Chopp", category:"canecas", icon:"🍺", desc:"Caneca chopp translúcida personalizada. Elegante e divertida!", badge:null,
+    variants:[{label:"Padrão", price:59.90}]
+  },
+  { id:14, name:"Garrafa Personalizada", category:"canecas", icon:"🍶", desc:"Garrafa inox personalizada. Presente prático e bonito!", badge:null,
+    variants:[{label:"Padrão", price:59.90}]
+  },
+  // UTILIDADES
+  { id:15, name:"Tábua de Vidro", category:"utilidades", icon:"🪟", desc:"Tábua de vidro personalizada — presente sofisticado para a cozinha.", badge:"Premium",
+    variants:[{label:"Padrão", price:79.90}]
+  },
+  { id:16, name:"Porta Joias", category:"utilidades", icon:"💍", desc:"Porta joias com gravação personalizada. Elegante e prático.", badge:null,
+    variants:[{label:"Mini", price:34.90}]
+  },
+  { id:17, name:"Porta Joias Premium", category:"utilidades", icon:"👑", desc:"Porta joias completo com gravação. Presente de alto valor.", badge:"Premium",
+    variants:[{label:"Grande", price:59.90}]
+  },
+  { id:18, name:"Necessaire", category:"utilidades", icon:"👜", desc:"Necessaire 20x15cm personalizada. Prática e fofa!", badge:null,
+    variants:[{label:"20x15cm", price:12.00}]
+  },
+  { id:19, name:"Ecobag Algodão Cru", category:"utilidades", icon:"🛍️", desc:"Ecobag de algodão cru com estampa personalizada.", badge:null,
+    variants:[{label:"Padrão", price:39.90}]
+  },
+  { id:20, name:"Toalha Lavabo", category:"utilidades", icon:"🧴", desc:"Toalha de lavabo personalizada — presente delicado e útil.", badge:null,
+    variants:[{label:"Padrão", price:16.90}]
+  },
+  { id:21, name:"Almofada", category:"utilidades", icon:"🛋️", desc:"Almofada personalizada com arte ou foto. Conforto com amor!", badge:null,
+    variants:[{label:"Padrão", price:39.90}]
+  },
+  { id:22, name:"Tapa Olho", category:"utilidades", icon:"😴", desc:"Tapa olho personalizado — presente carinhoso e divertido!", badge:null,
+    variants:[{label:"Padrão", price:19.90}]
+  },
+  { id:23, name:"Pantufa", category:"utilidades", icon:"🥿", desc:"Pantufa personalizada com mensagem especial para a mamãe.", badge:null,
+    variants:[{label:"Padrão", price:49.90}]
+  },
+  { id:24, name:"Mouse Pad", category:"utilidades", icon:"🖱️", desc:"Mouse pad personalizado com foto ou arte. Presente diferente!", badge:null,
+    variants:[{label:"Padrão", price:19.90}]
+  },
+  { id:25, name:"Espelho de Bolsa", category:"utilidades", icon:"🪞", desc:"Espelho de bolsa personalizado — mimo delicado!", badge:null,
+    variants:[{label:"Padrão", price:9.90}]
+  },
+  { id:26, name:"Porta Cartão", category:"utilidades", icon:"💳", desc:"Porta cartão em couro sintético com gravação personalizada.", badge:null,
+    variants:[{label:"Padrão", price:14.90}]
+  },
+  { id:27, name:"Cofre", category:"utilidades", icon:"🏦", desc:"Cofre personalizado. Presente criativo e especial!", badge:null,
+    variants:[{label:"Padrão", price:39.90}]
+  },
+  { id:28, name:"Moskeline (Caderno)", category:"utilidades", icon:"📒", desc:"Caderno personalizado com nome ou arte. Presente cute!", badge:null,
+    variants:[{label:"Padrão", price:24.90}]
+  },
+  { id:29, name:"Marca Páginas", category:"utilidades", icon:"📖", desc:"Marca páginas personalizado com foto e franja. Delicado!", badge:null,
+    variants:[{label:"Padrão", price:19.90}]
+  },
+  // LEMBRANÇAS
+  { id:30, name:"Potinho do Amor", category:"lembranças", icon:"🫙", desc:"Potinho de vidro com fotos dentro. Um presentinho incrível!", badge:null,
+    variants:[{label:"Padrão", price:19.90}]
+  },
+  { id:31, name:"Monóculos", category:"lembranças", icon:"🔭", desc:"Monóculos personalizados com foto.", badge:null,
+    variants:[
+      {label:"Sem tubolata", price:18.00},
+      {label:"Com tubolata", price:24.90}
+    ]
+  },
+  { id:32, name:"Chaveiro Personalizado", category:"lembranças", icon:"🗝️", desc:"Chaveiro acrílico personalizado com foto. Consulte modelos.", badge:null,
+    variants:[{label:"Padrão", price:19.90}]
+  },
+  { id:33, name:"Mini Azulejo Imã", category:"lembranças", icon:"🧲", desc:"Mini azulejo imã de geladeira personalizado.", badge:null,
+    variants:[{label:"Padrão", price:9.90}]
+  },
+  { id:34, name:"Polaroid", category:"lembranças", icon:"📷", desc:"Fotos no estilo polaroid. Mínimo 10 unidades.", badge:"Min. 10 un",
+    variants:[{label:"A partir de 10 unidades (por un.)", price:2.20}]
+  },
+  { id:35, name:"Polaroid com Imã", category:"lembranças", icon:"📸", desc:"Fotos polaroid com imã de geladeira. Mínimo 10 unidades.", badge:"Min. 10 un",
+    variants:[{label:"A partir de 10 unidades (por un.)", price:3.90}]
+  },
+  { id:36, name:"Tirinha de Fotos", category:"lembranças", icon:"🎞️", desc:"Tirinha de fotos personalizada. Mínimo 5 unidades.", badge:"Min. 5 un",
+    variants:[{label:"A partir de 5 unidades (por un.)", price:4.90}]
+  },
+  { id:37, name:"Vela na Latinha", category:"lembranças", icon:"🕯️", desc:"Vela aromática em latinha personalizada. Mimo delicado!", badge:null,
+    variants:[{label:"Padrão (por un.)", price:5.60}]
+  },
+  { id:38, name:"Buquê Vela Florzinha", category:"lembranças", icon:"💐", desc:"Buquê de velas em formato de flores. Apaixonante!", badge:"Especial",
+    variants:[{label:"Padrão", price:12.00}]
+  },
+  { id:39, name:"Cartão Foto", category:"lembranças", icon:"💌", desc:"Cartão personalizado com foto e mensagem.", badge:null,
+    variants:[{label:"Padrão", price:8.90}]
+  },
+  { id:40, name:"Lata Personalizada", category:"lembranças", icon:"🎁", desc:"Lata personalizada — com ou sem chocolates sortidos.", badge:null,
+    variants:[
+      {label:"Com chocolates sortidos", price:45.00},
+      {label:"Vazia", price:35.00}
+    ]
+  },
+  { id:41, name:"Tubolata", category:"lembranças", icon:"🎀", desc:"Tubolata presenteável — com ou sem chocolates sortidos.", badge:null,
+    variants:[
+      {label:"Com chocolates sortidos", price:25.00},
+      {label:"Vazia", price:19.00}
+    ]
+  },
+  { id:42, name:"Mini Aromatizador", category:"lembranças", icon:"🌸", desc:"Mini aromatizador de ambiente personalizado. Mínimo 10 un.", badge:"Min. 10 un",
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:4.90},
+      {label:"A partir de 30 unidades (por un.)", price:4.65}
+    ]
+  },
+  // CHOCOLATES & CARDS
+  { id:43, name:"Card + Mini Tablete", category:"chocolates", icon:"🍫", desc:"Card personalizado com mini tablete de chocolate. Min. 10 un.", badge:"Brinde",
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:3.40},
+      {label:"A partir de 30 unidades (por un.)", price:3.25}
+    ]
+  },
+  { id:44, name:"Card Flor + Chocolate", category:"chocolates", icon:"🌺", desc:"Card flor com chocolate. Delicado e especial! Min. 10 un.", badge:null,
+    variants:[
+      {label:"Com Alpino (por un.)", price:7.00},
+      {label:"Com Ferrero Rocher (por un.)", price:8.50}
+    ]
+  },
+  { id:45, name:"Card + Coloreti Coração", category:"chocolates", icon:"🍬", desc:"Card personalizado com coloreti coração. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:4.00},
+      {label:"A partir de 30 unidades (por un.)", price:3.80}
+    ]
+  },
+  { id:46, name:"Card + Mini Talento", category:"chocolates", icon:"🍫", desc:"Card personalizado com mini talento. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:8.50},
+      {label:"A partir de 30 unidades (por un.)", price:8.10}
+    ]
+  },
+  { id:47, name:"Card + Mini Buquê Ferrero", category:"chocolates", icon:"🌹", desc:"Card com mini buquê e Ferrero Rocher. Min. 10 un.", badge:"Especial",
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:10.40},
+      {label:"A partir de 30 unidades (por un.)", price:9.85}
+    ]
+  },
+  { id:48, name:"Buquê Flor + Trio Ferrero", category:"chocolates", icon:"💐", desc:"Buquê de flores com trio Ferrero Rocher. Presentão!", badge:"Premium",
+    variants:[{label:"Padrão", price:22.50}]
+  },
+  { id:49, name:"Card + Bombom Luxo", category:"chocolates", icon:"🍬", desc:"Card sofisticado com bombom de luxo. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:6.40},
+      {label:"A partir de 30 unidades (por un.)", price:6.05}
+    ]
+  },
+  { id:50, name:"Bombom Personalizado", category:"chocolates", icon:"🍫", desc:"Bombom com embalagem personalizada. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:3.40},
+      {label:"A partir de 30 unidades (por un.)", price:3.25}
+    ]
+  },
+  { id:51, name:"Buquê com 4 Bis", category:"chocolates", icon:"🎀", desc:"Buquê com 4 bis personalizados. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:8.40},
+      {label:"A partir de 30 unidades (por un.)", price:8.00}
+    ]
+  },
+  { id:52, name:"Card + Moedinha", category:"chocolates", icon:"🪙", desc:"Card personalizado com moedinha de chocolate. Min. 10 un.", badge:"Brinde",
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:2.00},
+      {label:"A partir de 30 unidades (por un.)", price:1.90}
+    ]
+  },
+  { id:53, name:"KitKat Personalizado", category:"chocolates", icon:"🍫", desc:"KitKat com embalagem personalizada. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:6.50},
+      {label:"A partir de 30 unidades (por un.)", price:6.20}
+    ]
+  },
+  { id:54, name:"Barra Chocolate 90g", category:"chocolates", icon:"🍫", desc:"Barra de chocolate 90g com embalagem personalizada. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:12.00},
+      {label:"A partir de 30 unidades (por un.)", price:11.40}
+    ]
+  },
+  { id:55, name:"Card + Baton", category:"chocolates", icon:"💋", desc:"Card personalizado com baton de chocolate. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:3.40},
+      {label:"A partir de 30 unidades (por un.)", price:3.25}
+    ]
+  },
+  { id:56, name:"Kit 3 Bis", category:"chocolates", icon:"🍫", desc:"Kit com 3 bis em embalagem personalizada. Min. 10 un.", badge:null,
+    variants:[
+      {label:"A partir de 10 unidades (por un.)", price:5.50},
+      {label:"A partir de 30 unidades (por un.)", price:5.25}
+    ]
+  },
+  { id:57, name:"Card + Chaveiro Acrílico", category:"chocolates", icon:"🗝️", desc:"Card personalizado com chaveiro acrílico com foto.", badge:null,
+    variants:[
+      {label:"Unitário", price:9.90},
+      {label:"A partir de 30 unidades (por un.)", price:8.40}
+    ]
+  },
+  { id:58, name:"Rosa com Ferrero", category:"chocolates", icon:"🌹", desc:"Rosa decorativa com Ferrero Rocher — presente romântico!", badge:"Especial",
+    variants:[{label:"Padrão", price:24.90}]
+  },
+];
+
+// =====================
+// STATE
+// =====================
+let cart = [];
+let currentFilter = 'todos';
+let modalProduct = null;
+let selectedVariantIdx = 0;
+
+// =====================
+// RENDER PRODUCTS
+// =====================
+function renderProducts(filter) {
+  const grid = document.getElementById('productsGrid');
+  const title = document.getElementById('sectionTitle');
+
+  const filtered = filter === 'todos' ? products : products.filter(p => p.category === filter);
+  const names = {
+    'todos':'Todos os produtos', 'quadros':'Quadros & Fotos',
+    'azulejos':'Azulejos', 'canecas':'Canecas & Bebidas',
+    'utilidades':'Utilidades & Presentes', 'lembranças':'Lembranças & Brindes',
+    'chocolates':'Chocolates & Cards'
+  };
+  title.textContent = `${names[filter] || 'Todos'} (${filtered.length})`;
+
+  grid.innerHTML = filtered.map(p => {
+    const minPrice = Math.min(...p.variants.map(v=>v.price));
+    const hasVariants = p.variants.length > 1;
+    return `
+      <div class="product-card" data-category="${p.category}">
+      <div class="product-img">
+          ${p.image
+            ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+            : `<span style="font-size:56px">${p.icon}</span>`
+          }
+          ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
+        </div>
+        <div class="product-body">
+          <div class="product-category">${categoryName(p.category)}</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-desc">${p.desc}</div>
+          <div class="product-price-row">
+            <div>
+              ${hasVariants ? `<div class="product-price-from">A partir de</div>` : ''}
+              <div class="product-price">R$ ${minPrice.toFixed(2).replace('.',',')}</div>
+            </div>
+          </div>
+          <button class="add-btn" onclick="handleAddProduct(${p.id})">
+            ${hasVariants ? '+ Escolher opção' : '+ Adicionar'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function categoryName(cat) {
+  const m = {'quadros':'Quadros & Fotos','azulejos':'Azulejos','canecas':'Canecas','utilidades':'Utilidades','lembranças':'Lembranças','chocolates':'Chocolates & Cards'};
+  return m[cat] || cat;
+}
+
+function filterProducts(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProducts(filter);
+}
+
+// =====================
+// MODAL
+// =====================
+function handleAddProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+
+  if (p.variants.length === 1) {
+    addToCart(p, 0);
+    return;
+  }
+
+  modalProduct = p;
+  selectedVariantIdx = 0;
+  document.getElementById('modalIcon').textContent = p.icon;
+  document.getElementById('modalCategory').textContent = categoryName(p.category);
+  document.getElementById('modalName').textContent = p.name;
+
+  const container = document.getElementById('modalVariantsContainer');
+  container.innerHTML = `
+    <span class="variant-label">Escolha uma opção:</span>
+    <div class="variant-options">
+      ${p.variants.map((v,i) => `
+        <div class="variant-opt ${i===0?'selected':''}" onclick="selectVariant(${i}, this)">
+          ${v.label}
+          <span class="opt-price">R$ ${v.price.toFixed(2).replace('.',',')}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function selectVariant(idx, el) {
+  selectedVariantIdx = idx;
+  document.querySelectorAll('.variant-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  modalProduct = null;
+}
+
+function addFromModal() {
+  if (!modalProduct) return;
+  addToCart(modalProduct, selectedVariantIdx);
+  closeModal();
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+// =====================
+// CART LOGIC
+// =====================
+function addToCart(product, variantIdx) {
+  const variant = product.variants[variantIdx];
+  const key = `${product.id}-${variantIdx}`;
+  const existing = cart.find(i => i.key === key);
+
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({
+      key, id: product.id, name: product.name,
+      icon: product.icon, variant: variant.label,
+      price: variant.price, qty: 1
+    });
+  }
+
+  updateCartUI();
+  showToast(`${product.icon} ${product.name} adicionado!`);
+}
+
+function removeFromCart(key) {
+  cart = cart.filter(i => i.key !== key);
+  updateCartUI();
+}
+
+function changeQty(key, delta) {
+  const item = cart.find(i => i.key === key);
+  if (!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const count = cart.reduce((s,i) => s + i.qty, 0);
+
+  // Count badge
+  const badge = document.getElementById('cartCount');
+  badge.textContent = count;
+  badge.classList.toggle('show', count > 0);
+
+  // Total
+  document.getElementById('cartTotal').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
+
+  // Checkout button
+  document.getElementById('checkoutBtn').disabled = cart.length === 0;
+
+  // Items list
+  const container = document.getElementById('cartItems');
+  if (cart.length === 0) {
+    container.innerHTML = `
+      <div class="cart-empty">
+        <div class="cart-empty-icon">🛍️</div>
+        <p>Carrinho vazio</p>
+        <small>Adicione produtos para começar!</small>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-icon">${item.icon}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-variant">${item.variant}</div>
+        <div class="cart-item-controls">
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty('${item.key}', -1)">−</button>
+            <span class="qty-display">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty('${item.key}', 1)">+</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span class="cart-item-price">R$ ${(item.price * item.qty).toFixed(2).replace('.',',')}</span>
+            <button class="remove-btn" onclick="removeFromCart('${item.key}')" title="Remover">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// =====================
+// CART SIDEBAR
+// =====================
+function toggleCart() {
+  const overlay = document.getElementById('cartOverlay');
+  const sidebar = document.getElementById('cartSidebar');
+  overlay.classList.toggle('open');
+  sidebar.classList.toggle('open');
+}
+
+// =====================
+// WHATSAPP CHECKOUT
+// =====================
+function finalizarPedido() {
+  if (cart.length === 0) return;
+
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+
+  let msg = '🌸 *Olá! Gostaria de fazer um pedido na Lavi Personalizados:*\n\n';
+
+  cart.forEach(item => {
+    msg += `🛍️ *${item.name}*\n`;
+    msg += `   Opção: ${item.variant}\n`;
+    msg += `   Qtd: ${item.qty} × R$ ${item.price.toFixed(2).replace('.',',')}`;
+    if (item.qty > 1) {
+      msg += ` = R$ ${(item.price * item.qty).toFixed(2).replace('.',',')}`;
+    }
+    msg += '\n\n';
+  });
+
+  msg += `💰 *Total estimado: R$ ${total.toFixed(2).replace('.',',')}*\n\n`;
+  msg += `📦 Por favor, me informe as opções de pagamento e prazo de entrega. Obrigada! 🌸`;
+
+  // TROQUE PELO NÚMERO REAL DA LAVI (somente números, com código do país: 55 + DDD + número)
+  const telefone = '5514982097721';
+
+  const url = `https://wa.me/${telefone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+// =====================
+// TOAST
+// =====================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// =====================
+// INIT — carrega do Supabase ou usa fallback
+// =====================
+let products = [...products_fallback];
+
+async function loadFromSupabase() {
+  if (!sb || SUPABASE_URL === 'https://jylvdownsghgjsxbqfxs.supabase.co') {
+    // Sem Supabase configurado — usa dados estáticos
+    renderProducts('todos');
+    return;
+  }
+  try {
+    const { data, error } = await sb
+      .from('produtos')
+      .select('*, variantes(id, label, preco, ordem)')
+      .eq('ativo', true)
+      .order('categoria')
+      .order('nome');
+
+    if (error || !data || data.length === 0) {
+      renderProducts('todos');
+      return;
+    }
+
+    // Transforma formato Supabase → formato do site
+    products = data.map(p => ({
+      id: p.id,
+      name: p.nome,
+      category: p.categoria,
+      icon: p.icone || '🎁',
+      desc: p.descricao || '',
+      badge: p.badge || null,
+      image: p.imagem_url || null,
+      variants: (p.variantes || [])
+        .sort((a,b) => a.ordem - b.ordem)
+        .map(v => ({ label: v.label, price: parseFloat(v.preco) }))
+    }));
+
+    renderProducts('todos');
+  } catch(e) {
+    renderProducts('todos');
+  }
+}
+
+loadFromSupabase();
+</script>
+</body>
+</html>
