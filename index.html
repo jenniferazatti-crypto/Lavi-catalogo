@@ -738,6 +738,38 @@
 
   .toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* CAMPAIGN BANNER */
+  .campaign-banner {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+    color: white;
+    padding: 10px 24px;
+  }
+  .camp-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .camp-btn {
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: white;
+    padding: 5px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+    transition: all 0.2s;
+  }
+  .camp-btn:hover { background: rgba(255,255,255,0.4); }
+  .campaign-filter-btn { border-color: var(--rose) !important; color: var(--rose) !important; }
+  .campaign-filter-btn.active { background: var(--rose) !important; border-color: var(--rose) !important; color: white !important; }
+
   /* FOOTER */
   footer {
     background: var(--navy);
@@ -786,17 +818,12 @@
   <p>Produtos personalizados para tornar essa data ainda mais especial. Escolha, adicione ao carrinho e finalize pelo WhatsApp!</p>
 </div>
 
+<!-- CAMPAIGN BANNER -->
+<div id="campaignBanner" style="display:none" class="campaign-banner"></div>
+
 <!-- FILTERS -->
 <div class="filters-section">
-  <div class="filters-inner">
-    <button class="filter-btn active" onclick="filterProducts('todos', this)">✨ Todos</button>
-    <button class="filter-btn" onclick="filterProducts('quadros', this)">🖼️ Quadros & Fotos</button>
-    <button class="filter-btn" onclick="filterProducts('azulejos', this)">🏠 Azulejos</button>
-    <button class="filter-btn" onclick="filterProducts('canecas', this)">☕ Canecas & Bebidas</button>
-    <button class="filter-btn" onclick="filterProducts('utilidades', this)">🎁 Utilidades</button>
-    <button class="filter-btn" onclick="filterProducts('lembranças', this)">💝 Lembranças</button>
-    <button class="filter-btn" onclick="filterProducts('chocolates', this)">🍫 Chocolates & Cards</button>
-  </div>
+  <div class="filters-inner" id="filtersInner"></div>
 </div>
 
 <!-- PRODUCTS -->
@@ -1143,17 +1170,29 @@ function renderProducts(filter) {
   const grid = document.getElementById('productsGrid');
   const title = document.getElementById('sectionTitle');
 
-  const filtered = filter === 'todos' ? products : products.filter(p => p.category === filter);
-  const names = {
-    'todos':'Todos os produtos', 'quadros':'Quadros & Fotos',
-    'azulejos':'Azulejos', 'canecas':'Canecas & Bebidas',
-    'utilidades':'Utilidades & Presentes', 'lembranças':'Lembranças & Brindes',
-    'chocolates':'Chocolates & Cards'
-  };
-  title.textContent = `${names[filter] || 'Todos'} (${filtered.length})`;
+  let filtered;
+  if (filter === '__campanha__' && activeCampaign) {
+    filtered = products.filter(p => p.campaign === activeCampaign.slug);
+  } else if (filter === 'todos') {
+    filtered = products;
+  } else {
+    filtered = products.filter(p => p.category === filter);
+  }
+
+  const cats = getCategories();
+  const catMap = {};
+  cats.forEach(c => catMap[c.slug] = c.nome);
+  const nameMap = { 'todos': 'Todos os produtos', '__campanha__': activeCampaign ? activeCampaign.nome : 'Campanha' };
+  cats.forEach(c => nameMap[c.slug] = c.nome);
+  title.textContent = `${nameMap[filter] || filter} (${filtered.length})`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-light);grid-column:1/-1">Nenhum produto encontrado nesta categoria.</div>';
+    return;
+  }
 
   grid.innerHTML = filtered.map(p => {
-    const minPrice = Math.min(...p.variants.map(v=>v.price));
+    const minPrice = p.variants.length ? Math.min(...p.variants.map(v=>v.price)) : 0;
     const hasVariants = p.variants.length > 1;
     return `
       <div class="product-card" data-category="${p.category}">
@@ -1165,7 +1204,7 @@ function renderProducts(filter) {
           ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
         </div>
         <div class="product-body">
-          <div class="product-category">${categoryName(p.category)}</div>
+          <div class="product-category">${catMap[p.category] || categoryName(p.category)}</div>
           <div class="product-name">${p.name}</div>
           <div class="product-desc">${p.desc}</div>
           <div class="product-price-row">
@@ -1191,7 +1230,7 @@ function categoryName(cat) {
 function filterProducts(filter, btn) {
   currentFilter = filter;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   renderProducts(filter);
 }
 
@@ -1386,23 +1425,85 @@ function showToast(msg) {
 // =====================
 // INIT — carrega do Supabase ou usa fallback
 // =====================
+// =====================
+// STATE — campanhas e categorias dinâmicas
+// =====================
 let products = [...products_fallback];
+let activeCampaign = null;  // { slug: 'dia-das-maes', nome: 'Dia das Mães' }
+let dbCategories = [];
 
+const defaultCategories = [
+  { slug:'quadros',    nome:'Quadros & Fotos',    icone:'🖼️' },
+  { slug:'azulejos',   nome:'Azulejos',           icone:'🏠' },
+  { slug:'canecas',    nome:'Canecas & Bebidas',  icone:'☕' },
+  { slug:'utilidades', nome:'Utilidades',         icone:'🎁' },
+  { slug:'lembrancas', nome:'Lembranças',         icone:'💝' },
+  { slug:'chocolates', nome:'Chocolates & Cards', icone:'🍫' },
+];
+
+function getCategories() {
+  return dbCategories.length ? dbCategories : defaultCategories;
+}
+
+// =====================
+// RENDER FILTROS (dinâmico)
+// =====================
+function renderFilters() {
+  const el = document.getElementById('filtersInner');
+  const cats = getCategories();
+  let html = `<button class="filter-btn ${currentFilter==='todos'?'active':''}" onclick="filterProducts('todos',this)">✨ Todos</button>`;
+  if (activeCampaign) {
+    html += `<button class="filter-btn campaign-filter-btn ${currentFilter==='__campanha__'?'active':''}" onclick="filterProducts('__campanha__',this)">🌟 ${activeCampaign.nome}</button>`;
+  }
+  cats.forEach(c => {
+    html += `<button class="filter-btn ${currentFilter===c.slug?'active':''}" onclick="filterProducts('${c.slug}',this)">${c.icone} ${c.nome}</button>`;
+  });
+  el.innerHTML = html;
+}
+
+// =====================
+// BANNER DE CAMPANHA
+// =====================
+function renderCampaignBanner() {
+  const banner = document.getElementById('campaignBanner');
+  if (!activeCampaign) { banner.style.display = 'none'; return; }
+  banner.innerHTML = `<div class="camp-inner">🌟 Campanha especial: <strong>${activeCampaign.nome}</strong>&nbsp;<button class="camp-btn" onclick="filterProducts('__campanha__', document.querySelector('.campaign-filter-btn'))">Ver produtos →</button></div>`;
+  banner.style.display = 'block';
+}
+
+// =====================
+// INIT — carrega do Supabase ou usa fallback
+// =====================
 async function loadFromSupabase() {
-  if (!sb || SUPABASE_URL === 'https://jylvdownsghgjsxbqfxs.supabase.co') {
-    // Sem Supabase configurado — usa dados estáticos
+  if (!sb) {
+    renderFilters();
     renderProducts('todos');
     return;
   }
   try {
-   const { data, error } = await sb
+    // Carrega categorias do banco
+    const { data: cats } = await sb.from('categorias').select('*').order('ordem').order('nome');
+    if (cats && cats.length > 0) {
+      dbCategories = cats.map(c => ({ slug: c.slug, nome: c.nome, icone: c.icone || '🏷️' }));
+    }
+
+    // Carrega campanha ativa
+    const { data: cfg } = await sb.from('configuracoes').select('valor').eq('chave', 'campanha_ativa').maybeSingle();
+    if (cfg?.valor) {
+      try { activeCampaign = JSON.parse(cfg.valor); }
+      catch(e) { activeCampaign = { slug: cfg.valor, nome: cfg.valor }; }
+    }
+
+    // Carrega produtos com variantes
+    const { data, error } = await sb
       .from('produtos')
-      .select('*')
+      .select('*, variantes(id, label, preco, ordem)')
       .eq('ativo', true)
       .order('nome');
 
-    console.log('Dados brutos:', JSON.stringify(data?.[7]));
     if (error || !data || data.length === 0) {
+      renderFilters();
+      renderCampaignBanner();
       renderProducts('todos');
       return;
     }
@@ -1416,14 +1517,20 @@ async function loadFromSupabase() {
       desc: p.descricao || '',
       badge: p.badge || null,
       image: p.imagem_url || null,
+      campaign: p.campanha || null,
       variants: (p.variantes || [])
         .sort((a,b) => a.ordem - b.ordem)
         .map(v => ({ label: v.label, price: parseFloat(v.preco) }))
     }));
 
+    renderFilters();
+    renderCampaignBanner();
     renderProducts('todos');
   } catch(e) {
-console.error('Erro Supabase:', e); renderProducts('todos');  }
+    console.error('Erro Supabase:', e);
+    renderFilters();
+    renderProducts('todos');
+  }
 }
 
 window.addEventListener('load', loadFromSupabase);
