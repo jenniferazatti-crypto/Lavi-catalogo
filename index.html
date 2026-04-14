@@ -1423,8 +1423,7 @@ async function loadFromSupabase() {
 
     renderProducts('todos');
   } catch(e) {
-    renderProducts('todos');
-  }
+console.error('Erro Supabase:', e); renderProducts('todos');  }
 }
 
 window.addEventListener('load', loadFromSupabase);
