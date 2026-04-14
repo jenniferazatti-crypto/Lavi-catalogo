@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavi Admin — Gerenciar Catálogo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bege: #FAF7F2;
+    --rose: #C9847A;
+    --rose-dark: #A86560;
+    --navy: #1E2D5A;
+    --navy-light: #2E4080;
+    --cream: #F2EDE6;
+    --text: #2C2C2C;
+    --text-light: #7A7A7A;
+    --white: #FFFFFF;
+    --green: #38A169;
+    --red: #E53E3E;
+    --border: rgba(201,132,122,0.2);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Lato',sans-serif; background:var(--bege); color:var(--text); min-height:100vh; }
+
+  /* LOGIN */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  }
+  .login-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    width: 360px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .login-logo .name { font-family:'Playfair Display',serif; font-size:32px; color:var(--navy); }
+  .login-logo .sub { font-size:11px; letter-spacing:3px; color:var(--rose); text-transform:uppercase; font-weight:700; }
+  .login-box h2 { font-size:16px; color:var(--text-light); text-align:center; margin-bottom:24px; font-weight:400; }
+  .form-group { margin-bottom:16px; }
+  .form-group label { display:block; font-size:12px; font-weight:700; color:var(--text); margin-bottom:6px; letter-spacing:0.5px; text-transform:uppercase; }
+  .form-group input, .form-group select, .form-group textarea {
+    width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px;
+    font-family:'Lato',sans-serif; font-size:14px; color:var(--text); background:var(--bege);
+    transition:border-color 0.2s; outline:none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--rose); background:white; }
+  .btn-primary {
+    width:100%; padding:14px; background:var(--navy); color:white; border:none; border-radius:10px;
+    font-family:'Lato',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s;
+  }
+  .btn-primary:hover { background:var(--navy-light); }
+  .error-msg { color:var(--red); font-size:13px; text-align:center; margin-top:12px; display:none; }
+
+  /* APP */
+  #app { display:none; }
+
+  /* TOPBAR */
+  .topbar {
+    background:var(--navy);
+    color:white;
+    padding:0 28px;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+  }
+  .topbar-logo { font-family:'Playfair Display',serif; font-size:20px; }
+  .topbar-logo span { color:var(--rose-dark); font-size:12px; font-weight:400; margin-left:8px; letter-spacing:1px; }
+  .topbar-right { display:flex; align-items:center; gap:16px; }
+  .topbar-user { font-size:13px; opacity:0.7; }
+  .btn-logout { background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-family:'Lato',sans-serif; transition:all 0.2s; }
+  .btn-logout:hover { background:rgba(255,255,255,0.2); }
+
+  /* MAIN LAYOUT */
+  .main { max-width:1100px; margin:0 auto; padding:32px 24px; }
+
+  /* STATS */
+  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+  .stat-card { background:white; border-radius:14px; padding:20px; box-shadow:0 2px 12px rgba(30,45,90,0.08); }
+  .stat-value { font-family:'Playfair Display',serif; font-size:32px; color:var(--navy); font-weight:700; }
+  .stat-label { font-size:12px; color:var(--text-light); margin-top:4px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; }
+
+  /* TOOLBAR */
+  .toolbar { display:flex; align-items:center; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+  .toolbar-title { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); flex:1; }
+  .btn-add {
+    background:var(--rose); color:white; border:none; border-radius:10px; padding:12px 24px;
+    font-family:'Lato',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; gap:8px;
+  }
+  .btn-add:hover { background:var(--rose-dark); transform:translateY(-1px); }
+  .search-input {
+    padding:10px 16px; border:1.5px solid var(--border); border-radius:10px;
+    font-family:'Lato',sans-serif; font-size:14px; width:220px; outline:none;
+    background:white; transition:border-color 0.2s;
+  }
+  .search-input:focus { border-color:var(--rose); }
+  .filter-select {
+    padding:10px 14px; border:1.5px solid var(--border); border-radius:10px;
+    font-family:'Lato',sans-serif; font-size:14px; outline:none; background:white; cursor:pointer;
+  }
+
+  /* TABLE */
+  .table-wrap { background:white; border-radius:16px; overflow:hidden; box-shadow:0 2px 12px rgba(30,45,90,0.08); }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:var(--bege); }
+  th { padding:14px 16px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-light); }
+  td { padding:14px 16px; border-top:1px solid var(--border); font-size:14px; }
+  tr:hover td { background:#FDFCFB; }
+  .prod-icon { font-size:28px; }
+  .prod-name { font-weight:700; color:var(--navy); }
+  .prod-desc { font-size:12px; color:var(--text-light); margin-top:2px; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:50px; font-size:11px; font-weight:700; }
+  .badge-cat { background:rgba(201,132,122,0.15); color:var(--rose-dark); }
+  .badge-ativo { background:rgba(56,161,105,0.12); color:var(--green); }
+  .badge-inativo { background:rgba(229,62,62,0.12); color:var(--red); }
+  .price-min { font-weight:700; color:var(--navy); }
+  .variants-count { font-size:12px; color:var(--text-light); }
+  .actions { display:flex; gap:8px; }
+  .btn-edit { padding:7px 14px; border:1.5px solid var(--navy); border-radius:8px; background:transparent; color:var(--navy); font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:'Lato',sans-serif; }
+  .btn-edit:hover { background:var(--navy); color:white; }
+  .btn-toggle { padding:7px 14px; border:1.5px solid; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:'Lato',sans-serif; }
+  .btn-toggle.ativo { border-color:var(--red); color:var(--red); background:transparent; }
+  .btn-toggle.ativo:hover { background:var(--red); color:white; }
+  .btn-toggle.inativo { border-color:var(--green); color:var(--green); background:transparent; }
+  .btn-toggle.inativo:hover { background:var(--green); color:white; }
+  .btn-del { padding:7px 10px; border:1.5px solid rgba(229,62,62,0.3); border-radius:8px; background:transparent; color:var(--red); font-size:14px; cursor:pointer; transition:all 0.2s; }
+  .btn-del:hover { background:var(--red); color:white; border-color:var(--red); }
+  .prod-img-thumb { width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid var(--border); }
+  .img-placeholder { width:44px; height:44px; background:var(--cream); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+  .empty-state { text-align:center; padding:60px; color:var(--text-light); }
+  .loading { text-align:center; padding:40px; color:var(--text-light); }
+
+  /* MODAL */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+    opacity:0; pointer-events:none; transition:opacity 0.25s; backdrop-filter:blur(3px);
+  }
+  .modal-overlay.open { opacity:1; pointer-events:all; }
+  .modal {
+    background:white; border-radius:20px; width:100%; max-width:560px;
+    max-height:90vh; overflow-y:auto; padding:32px;
+    box-shadow:0 24px 64px rgba(0,0,0,0.2);
+    transform:translateY(20px); transition:transform 0.3s;
+  }
+  .modal-overlay.open .modal { transform:translateY(0); }
+  .modal-title { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); margin-bottom:24px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-group textarea { min-height:80px; resize:vertical; }
+  .variants-section { margin-top:20px; }
+  .variants-title { font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+  .variant-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+  .variant-row input { flex:1; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:13px; outline:none; }
+  .variant-row input:focus { border-color:var(--rose); }
+  .variant-row .price-input { width:120px; flex:none; }
+  .btn-remove-var { background:none; border:none; color:var(--red); font-size:18px; cursor:pointer; padding:4px; }
+  .btn-add-var { background:none; border:1.5px dashed var(--border); color:var(--text-light); padding:10px; border-radius:8px; cursor:pointer; font-family:'Lato',sans-serif; font-size:13px; width:100%; margin-top:4px; transition:all 0.2s; }
+  .btn-add-var:hover { border-color:var(--rose); color:var(--rose); }
+  .modal-actions { display:flex; gap:12px; margin-top:28px; }
+  .btn-cancel { flex:1; padding:13px; border:1.5px solid var(--border); border-radius:10px; background:transparent; color:var(--text-light); font-family:'Lato',sans-serif; font-size:14px; cursor:pointer; transition:all 0.2s; }
+  .btn-cancel:hover { border-color:var(--rose); color:var(--rose); }
+  .btn-save { flex:2; padding:13px; border:none; border-radius:10px; background:var(--rose); color:white; font-family:'Lato',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+  .btn-save:hover { background:var(--rose-dark); }
+  .btn-save:disabled { opacity:0.6; cursor:not-allowed; }
+
+  /* IMAGE UPLOAD */
+  .img-upload-area {
+    border:2px dashed var(--border); border-radius:12px; padding:20px;
+    text-align:center; cursor:pointer; transition:all 0.2s; position:relative;
+    background:var(--bege);
+  }
+  .img-upload-area:hover { border-color:var(--rose); background:white; }
+  .img-upload-area input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .img-upload-preview { width:80px; height:80px; object-fit:cover; border-radius:10px; margin:0 auto 8px; display:block; }
+  .img-upload-text { font-size:13px; color:var(--text-light); }
+  .img-upload-text strong { color:var(--rose); }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--navy); color:white; padding:12px 24px; border-radius:50px; font-size:14px; font-weight:700; z-index:500; transition:transform 0.35s; white-space:nowrap; box-shadow:0 8px 32px rgba(30,45,90,0.3); }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  .toast.success { background:var(--green); }
+  .toast.error { background:var(--red); }
+
+  /* CONFIG BANNER */
+  .config-banner { background:#FFF3CD; border:1px solid #FFEAA7; border-radius:12px; padding:16px 20px; margin-bottom:24px; font-size:13px; color:#856404; display:none; }
+  .config-banner strong { display:block; margin-bottom:4px; font-size:14px; }
+  .config-banner code { background:rgba(0,0,0,0.08); padding:2px 6px; border-radius:4px; font-size:12px; }
+
+  @media(max-width:768px) {
+    .stats-row { grid-template-columns:repeat(2,1fr); }
+    .form-row { grid-template-columns:1fr; }
+    .toolbar { flex-direction:column; align-items:stretch; }
+    .search-input { width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CONFIG: coloque suas credenciais aqui -->
+<script>
+  // ⚠️ SUBSTITUA COM SUAS CREDENCIAIS DO SUPABASE
+  const SUPABASE_URL = 'https://jylvdownsghgjsxbqfxs.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_PmHqYJtwfovvVe79pUEWNA_eLFdHiBb';
+  // Email de login do admin (cadastre em Supabase > Auth > Users)
+  // Ex: admin@laviPersonalizados.com
+</script>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="name">lavi</div>
+      <div class="sub">painel admin</div>
+    </div>
+    <h2>Acesso ao gerenciador de catálogo</h2>
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com">
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    <div class="error-msg" id="loginError">E-mail ou senha incorretos.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="config-banner" id="configBanner">
+    <strong>⚠️ Configure suas credenciais do Supabase</strong>
+    Edite o arquivo e substitua <code>https://jylvdownsghgjsxbqfxs.supabase.co</code> e <code>sb_publishable_PmHqYJtwfovvVe79pUEWNA_eLFdHiBb</code> pelas credenciais do seu projeto Supabase.
+  </div>
+
+  <div class="topbar">
+    <div class="topbar-logo">lavi <span>ADMIN</span></div>
+    <div class="topbar-right">
+      <span class="topbar-user" id="topbarUser"></span>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-label">Total de produtos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statAtivos">—</div>
+        <div class="stat-label">Ativos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statInativos">—</div>
+        <div class="stat-label">Inativos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statCategorias">—</div>
+        <div class="stat-label">Categorias</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-title">Produtos</div>
+      <input class="search-input" type="text" placeholder="🔍 Buscar produto..." oninput="filterTable(this.value)">
+      <select class="filter-select" onchange="filterByCategoria(this.value)">
+        <option value="">Todas as categorias</option>
+        <option value="quadros">Quadros & Fotos</option>
+        <option value="azulejos">Azulejos</option>
+        <option value="canecas">Canecas & Bebidas</option>
+        <option value="utilidades">Utilidades</option>
+        <option value="lembrancas">Lembranças</option>
+        <option value="chocolates">Chocolates & Cards</option>
+      </select>
+      <button class="btn-add" onclick="openModal()">+ Novo Produto</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Imagem</th>
+            <th>Categoria</th>
+            <th>Preço</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="productsTable">
+          <tr><td colspan="6" class="loading">Carregando produtos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Novo Produto</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome do produto *</label>
+        <input type="text" id="fNome" placeholder="Ex: Caneca Personalizada">
+      </div>
+      <div class="form-group">
+        <label>Emoji do produto</label>
+        <input type="text" id="fIcone" placeholder="Ex: ☕" maxlength="4">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Categoria *</label>
+        <select id="fCategoria">
+          <option value="">Selecione...</option>
+          <option value="quadros">Quadros & Fotos</option>
+          <option value="azulejos">Azulejos</option>
+          <option value="canecas">Canecas & Bebidas</option>
+          <option value="utilidades">Utilidades</option>
+          <option value="lembrancas">Lembranças</option>
+          <option value="chocolates">Chocolates & Cards</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Badge (opcional)</label>
+        <input type="text" id="fBadge" placeholder="Ex: Novo, Premium, Especial">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea id="fDescricao" placeholder="Breve descrição do produto..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Foto do produto</label>
+      <div class="img-upload-area" id="uploadArea">
+        <input type="file" id="fImagem" accept="image/*" onchange="previewImage(this)">
+        <img id="imgPreview" class="img-upload-preview" style="display:none">
+        <div class="img-upload-text" id="uploadText">
+          <div style="font-size:28px;margin-bottom:6px">📷</div>
+          <div>Clique para <strong>adicionar foto</strong></div>
+          <div style="margin-top:4px;font-size:11px">JPG, PNG ou WebP · Máx. 2MB</div>
+        </div>
+      </div>
+      <input type="hidden" id="fImagemUrl">
+    </div>
+
+    <div class="variants-section">
+      <div class="variants-title">Variantes e preços *</div>
+      <div id="variantsList"></div>
+      <button class="btn-add-var" onclick="addVariantRow()">+ Adicionar variante</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" id="btnSave" onclick="saveProduct()">Salvar produto</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// =====================
+// SUPABASE INIT
+// =====================
+let supabase;
+let currentUser = null;
+let products = [];
+let editingId = null;
+let filterText = '';
+let filterCat = '';
+
+function initSupabase() {
+  if (SUPABASE_URL === 'COLE_SUA_PROJECT_URL_AQUI') {
+    document.getElementById('configBanner').style.display = 'block';
+    return false;
+  }
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  return true;
+}
+
+// =====================
+// AUTH
+// =====================
+async function doLogin() {
+  if (!initSupabase()) {
+    showToast('Configure as credenciais do Supabase primeiro!', 'error');
+    return;
+  }
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const err = document.getElementById('loginError');
+
+  if (!email || !password) { err.style.display='block'; err.textContent='Preencha e-mail e senha.'; return; }
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { err.style.display='block'; err.textContent='E-mail ou senha incorretos.'; return; }
+
+  currentUser = data.user;
+  showApp();
+}
+
+async function doLogout() {
+  await supabase.auth.signOut();
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('topbarUser').textContent = currentUser.email;
+  loadProducts();
+}
+
+// Check session on load
+window.addEventListener('load', async () => {
+  if (!initSupabase()) return;
+  const { data } = await supabase.auth.getSession();
+  if (data.session) {
+    currentUser = data.session.user;
+    showApp();
+  }
+});
+
+// =====================
+// LOAD PRODUCTS
+// =====================
+async function loadProducts() {
+  const { data, error } = await supabase
+    .from('produtos')
+    .select('*, variantes(id, label, preco, ordem)')
+    .order('categoria')
+    .order('nome');
+
+  if (error) { showToast('Erro ao carregar produtos', 'error'); return; }
+
+  products = data || [];
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = products.length;
+  document.getElementById('statAtivos').textContent = products.filter(p=>p.ativo).length;
+  document.getElementById('statInativos').textContent = products.filter(p=>!p.ativo).length;
+  document.getElementById('statCategorias').textContent = [...new Set(products.map(p=>p.categoria))].length;
+}
+
+const catNames = {
+  quadros:'Quadros & Fotos', azulejos:'Azulejos', canecas:'Canecas',
+  utilidades:'Utilidades', lembrancas:'Lembranças', chocolates:'Chocolates & Cards'
+};
+
+function renderTable() {
+  const tbody = document.getElementById('productsTable');
+  let list = products;
+  if (filterText) list = list.filter(p => p.nome.toLowerCase().includes(filterText.toLowerCase()));
+  if (filterCat) list = list.filter(p => p.categoria === filterCat);
+
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum produto encontrado.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(p => {
+    const vars = (p.variantes || []).sort((a,b)=>a.ordem-b.ordem);
+    const minPrice = vars.length ? Math.min(...vars.map(v=>v.preco)) : 0;
+    const imgEl = p.imagem_url
+      ? `<img src="${p.imagem_url}" class="prod-img-thumb" alt="${p.nome}">`
+      : `<div class="img-placeholder">${p.icone || '🎁'}</div>`;
+
+    return `
+      <tr>
+        <td>
+          <div class="prod-name">${p.icone || ''} ${p.nome}</div>
+          <div class="prod-desc">${p.descricao || ''}</div>
+          ${p.badge ? `<span class="badge badge-cat">${p.badge}</span>` : ''}
+        </td>
+        <td>${imgEl}</td>
+        <td><span class="badge badge-cat">${catNames[p.categoria] || p.categoria}</span></td>
+        <td>
+          <div class="price-min">R$ ${minPrice.toFixed(2).replace('.',',')}</div>
+          <div class="variants-count">${vars.length} variante${vars.length!==1?'s':''}</div>
+        </td>
+        <td><span class="badge ${p.ativo?'badge-ativo':'badge-inativo'}">${p.ativo?'Ativo':'Inativo'}</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn-edit" onclick="openModal(${p.id})">✏️ Editar</button>
+            <button class="btn-toggle ${p.ativo?'ativo':'inativo'}" onclick="toggleAtivo(${p.id}, ${p.ativo})">
+              ${p.ativo ? '🚫 Desativar' : '✅ Ativar'}
+            </button>
+            <button class="btn-del" onclick="deleteProduct(${p.id})" title="Excluir">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterTable(val) { filterText = val; renderTable(); }
+function filterByCategoria(val) { filterCat = val; renderTable(); }
+
+// =====================
+// MODAL
+// =====================
+function openModal(id = null) {
+  editingId = id;
+  document.getElementById('modalTitle').textContent = id ? 'Editar Produto' : 'Novo Produto';
+  document.getElementById('variantsList').innerHTML = '';
+
+  if (id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('fNome').value = p.nome;
+    document.getElementById('fIcone').value = p.icone || '';
+    document.getElementById('fCategoria').value = p.categoria;
+    document.getElementById('fBadge').value = p.badge || '';
+    document.getElementById('fDescricao').value = p.descricao || '';
+    document.getElementById('fImagemUrl').value = p.imagem_url || '';
+
+    if (p.imagem_url) {
+      document.getElementById('imgPreview').src = p.imagem_url;
+      document.getElementById('imgPreview').style.display = 'block';
+      document.getElementById('uploadText').style.display = 'none';
+    } else {
+      document.getElementById('imgPreview').style.display = 'none';
+      document.getElementById('uploadText').style.display = 'block';
+    }
+
+    (p.variantes || []).sort((a,b)=>a.ordem-b.ordem).forEach(v => addVariantRow(v.label, v.preco));
+  } else {
+    document.getElementById('fNome').value = '';
+    document.getElementById('fIcone').value = '🎁';
+    document.getElementById('fCategoria').value = '';
+    document.getElementById('fBadge').value = '';
+    document.getElementById('fDescricao').value = '';
+    document.getElementById('fImagemUrl').value = '';
+    document.getElementById('imgPreview').style.display = 'none';
+    document.getElementById('uploadText').style.display = 'block';
+    addVariantRow();
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+}
+
+function addVariantRow(label = '', preco = '') {
+  const div = document.createElement('div');
+  div.className = 'variant-row';
+  div.innerHTML = `
+    <input type="text" placeholder="Ex: 15x21cm / Padrão / Com flor" value="${label}">
+    <input type="number" class="price-input" placeholder="Preço (R$)" step="0.01" min="0" value="${preco}">
+    <button class="btn-remove-var" onclick="this.parentElement.remove()">✕</button>
+  `;
+  document.getElementById('variantsList').appendChild(div);
+}
+
+function previewImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('imgPreview').src = e.target.result;
+    document.getElementById('imgPreview').style.display = 'block';
+    document.getElementById('uploadText').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// =====================
+// SAVE PRODUCT
+// =====================
+async function saveProduct() {
+  const nome = document.getElementById('fNome').value.trim();
+  const categoria = document.getElementById('fCategoria').value;
+  const icone = document.getElementById('fIcone').value.trim() || '🎁';
+  const badge = document.getElementById('fBadge').value.trim() || null;
+  const descricao = document.getElementById('fDescricao').value.trim() || null;
+  let imagemUrl = document.getElementById('fImagemUrl').value || null;
+
+  if (!nome || !categoria) { showToast('Preencha nome e categoria!', 'error'); return; }
+
+  const variantRows = document.querySelectorAll('#variantsList .variant-row');
+  const variants = [];
+  let valid = true;
+  variantRows.forEach((row, i) => {
+    const label = row.querySelectorAll('input')[0].value.trim();
+    const preco = parseFloat(row.querySelectorAll('input')[1].value);
+    if (!label || isNaN(preco) || preco < 0) { valid = false; return; }
+    variants.push({ label, preco, ordem: i });
+  });
+
+  if (!valid || variants.length === 0) { showToast('Adicione ao menos uma variante com label e preço!', 'error'); return; }
+
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    // Upload imagem se selecionada
+    const fileInput = document.getElementById('fImagem');
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const ext = file.name.split('.').pop();
+      const filename = `${Date.now()}.${ext}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('produtos')
+        .upload(filename, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage.from('produtos').getPublicUrl(filename);
+      imagemUrl = urlData.publicUrl;
+    }
+
+    const prodData = { nome, categoria, icone, badge, descricao, imagem_url: imagemUrl };
+
+    let prodId = editingId;
+
+    if (editingId) {
+      const { error } = await supabase.from('produtos').update(prodData).eq('id', editingId);
+      if (error) throw error;
+      // Remove variantes antigas
+      await supabase.from('variantes').delete().eq('produto_id', editingId);
+    } else {
+      const { data, error } = await supabase.from('produtos').insert(prodData).select().single();
+      if (error) throw error;
+      prodId = data.id;
+    }
+
+    // Inserir variantes
+    const variantsToInsert = variants.map(v => ({ ...v, produto_id: prodId }));
+    const { error: varError } = await supabase.from('variantes').insert(variantsToInsert);
+    if (varError) throw varError;
+
+    showToast(editingId ? '✓ Produto atualizado!' : '✓ Produto adicionado!', 'success');
+    closeModal();
+    await loadProducts();
+  } catch (err) {
+    showToast('Erro ao salvar: ' + (err.message || 'tente novamente'), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Salvar produto';
+  }
+}
+
+// =====================
+// TOGGLE ATIVO
+// =====================
+async function toggleAtivo(id, current) {
+  const { error } = await supabase.from('produtos').update({ ativo: !current }).eq('id', id);
+  if (error) { showToast('Erro ao atualizar status', 'error'); return; }
+  showToast(!current ? '✓ Produto ativado' : '✓ Produto desativado', 'success');
+  await loadProducts();
+}
+
+// =====================
+// DELETE
+// =====================
+async function deleteProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!confirm(`Excluir "${p?.nome}"? Essa ação não pode ser desfeita.`)) return;
+  const { error } = await supabase.from('produtos').delete().eq('id', id);
+  if (error) { showToast('Erro ao excluir', 'error'); return; }
+  showToast('✓ Produto excluído', 'success');
+  await loadProducts();
+}
+
+// =====================
+// TOAST
+// =====================
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
