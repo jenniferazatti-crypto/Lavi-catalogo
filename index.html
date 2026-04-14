@@ -813,7 +813,6 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-tag">🌸 Dia das Mães 2025</div>
   <h1>Presentes feitos<br>com <em>muito amor</em></h1>
   <p>Produtos personalizados para tornar essa data ainda mais especial. Escolha, adicione ao carrinho e finalize pelo WhatsApp!</p>
 </div>
@@ -1294,10 +1293,27 @@ document.getElementById('modalOverlay').addEventListener('click', function(e){
 // =====================
 // CART LOGIC
 // =====================
+
+// Detecta quantidade mínima pelo nome da variante
+// Padrões: "acima de X", "a partir de X", "mín. X", "min. X"
+function getMinQty(label) {
+  const patterns = [
+    /acima\s+de\s+(\d+)/i,
+    /a\s+partir\s+de\s+(\d+)/i,
+    /m[íi]n\.?\s*(\d+)/i,
+  ];
+  for (const re of patterns) {
+    const m = label.match(re);
+    if (m) return parseInt(m[1], 10);
+  }
+  return 1;
+}
+
 function addToCart(product, variantIdx) {
   const variant = product.variants[variantIdx];
   const key = `${product.id}-${variantIdx}`;
   const existing = cart.find(i => i.key === key);
+  const minQty = getMinQty(variant.label);
 
   if (existing) {
     existing.qty++;
@@ -1305,7 +1321,7 @@ function addToCart(product, variantIdx) {
     cart.push({
       key, id: product.id, name: product.name,
       icon: product.icon, variant: variant.label,
-      price: variant.price, qty: 1
+      price: variant.price, qty: minQty, minQty
     });
   }
 
@@ -1321,7 +1337,7 @@ function removeFromCart(key) {
 function changeQty(key, delta) {
   const item = cart.find(i => i.key === key);
   if (!item) return;
-  item.qty = Math.max(1, item.qty + delta);
+  item.qty = Math.max(item.minQty || 1, item.qty + delta);
   updateCartUI();
 }
 
@@ -1352,15 +1368,21 @@ function updateCartUI() {
     return;
   }
 
-  container.innerHTML = cart.map(item => `
+  container.innerHTML = cart.map(item => {
+    const atMin = item.qty <= (item.minQty || 1);
+    const minNote = (item.minQty || 1) > 1
+      ? `<span style="font-size:10px;color:var(--rose);margin-left:4px">(mín. ${item.minQty})</span>`
+      : '';
+    return `
     <div class="cart-item">
       <div class="cart-item-icon">${item.icon}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-variant">${item.variant}</div>
+        <div class="cart-item-variant">${item.variant}${minNote}</div>
         <div class="cart-item-controls">
           <div class="qty-controls">
-            <button class="qty-btn" onclick="changeQty('${item.key}', -1)">−</button>
+            <button class="qty-btn" onclick="changeQty('${item.key}', -1)"
+              ${atMin ? 'disabled style="opacity:0.35;cursor:not-allowed"' : ''}>−</button>
             <span class="qty-display">${item.qty}</span>
             <button class="qty-btn" onclick="changeQty('${item.key}', 1)">+</button>
           </div>
@@ -1371,7 +1393,8 @@ function updateCartUI() {
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // =====================
@@ -1392,7 +1415,7 @@ function finalizarPedido() {
 
   const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
 
-  let msg = '🌸 *Olá! Gostaria de fazer um pedido na Lavi Personalizados:*\n\n';
+  let msg = '*Olá! Gostaria de fazer um pedido na Lavi Personalizados:*\n\n';
 
   cart.forEach(item => {
     msg += `🛍️ *${item.name}*\n`;
@@ -1405,7 +1428,7 @@ function finalizarPedido() {
   });
 
   msg += `💰 *Total estimado: R$ ${total.toFixed(2).replace('.',',')}*\n\n`;
-  msg += `📦 Por favor, me informe as opções de pagamento e prazo de entrega. Obrigada! 🌸`;
+  msg += `📦 Por favor, me informe as opções de pagamento e prazo de entrega. Obrigado!`;
 
   // TROQUE PELO NÚMERO REAL DA LAVI (somente números, com código do país: 55 + DDD + número)
   const telefone = '5514982097721';
