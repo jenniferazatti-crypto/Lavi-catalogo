@@ -782,6 +782,129 @@
 
   footer strong { color: white; }
 
+  /* FAQ BUTTON */
+  .faq-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 150;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: white;
+    border: none;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(30,45,90,0.35);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.25s;
+    font-family: 'Lato', sans-serif;
+    line-height: 1;
+  }
+  .faq-btn:hover { background: var(--navy-light); transform: scale(1.08); }
+
+  /* FAQ PANEL */
+  .faq-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 160;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+    backdrop-filter: blur(2px);
+  }
+  .faq-overlay.open { opacity: 1; pointer-events: all; }
+
+  .faq-panel {
+    position: fixed;
+    bottom: 88px; right: 24px;
+    width: 360px;
+    max-height: 72vh;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 16px 56px rgba(30,45,90,0.22);
+    z-index: 161;
+    display: flex; flex-direction: column;
+    transform: translateY(16px) scale(0.97);
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .faq-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+  .faq-panel-header {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid rgba(201,132,122,0.15);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+    background: var(--bege);
+    border-radius: 20px 20px 0 0;
+  }
+  .faq-panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; color: var(--navy); font-weight: 700;
+  }
+  .faq-panel-title small {
+    display: block; font-family: 'Lato', sans-serif;
+    font-size: 11px; color: var(--text-light); font-weight: 400;
+    letter-spacing: 0.3px; margin-top: 2px;
+  }
+  .faq-close-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: white;
+    cursor: pointer; font-size: 16px; color: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(30,45,90,0.1);
+  }
+  .faq-close-btn:hover { background: var(--rose); color: white; }
+
+  .faq-body {
+    overflow-y: auto; padding: 16px 20px; flex: 1;
+    scrollbar-width: thin; scrollbar-color: rgba(201,132,122,0.3) transparent;
+  }
+  .faq-body::-webkit-scrollbar { width: 4px; }
+  .faq-body::-webkit-scrollbar-thumb { background: rgba(201,132,122,0.3); border-radius: 4px; }
+
+  .faq-item {
+    margin-bottom: 14px; padding-bottom: 14px;
+    border-bottom: 1px solid rgba(201,132,122,0.1);
+  }
+  .faq-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .faq-question {
+    font-weight: 700; font-size: 13px; color: var(--navy);
+    margin-bottom: 5px; line-height: 1.45;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .faq-question::before {
+    content: '?';
+    background: var(--rose);
+    color: white;
+    border-radius: 50%;
+    width: 17px; height: 17px;
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .faq-answer { font-size: 12.5px; color: var(--text-light); line-height: 1.6; padding-left: 25px; }
+
+  .faq-contact {
+    padding: 14px 20px 18px;
+    border-top: 1px solid rgba(201,132,122,0.15);
+    text-align: center; flex-shrink: 0;
+    background: var(--bege);
+    border-radius: 0 0 20px 20px;
+  }
+  .faq-contact p { font-size: 12px; color: var(--text-light); margin-bottom: 10px; font-weight: 700; }
+  .faq-contact-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #25D366; color: white; border: none;
+    border-radius: 50px; padding: 10px 22px;
+    font-family: 'Lato', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .faq-contact-btn:hover { background: #1EB854; transform: translateY(-1px); }
+
   /* RESPONSIVE */
   @media (max-width: 600px) {
     .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -792,6 +915,13 @@
 
   @media (max-width: 380px) {
     .products-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .faq-panel { right: 0; left: 0; bottom: 0; width: 100%; border-radius: 20px 20px 0 0; max-height: 82vh; }
+    .faq-panel-header { border-radius: 20px 20px 0 0; }
+    .faq-contact { border-radius: 0; }
+    .faq-btn { bottom: 16px; right: 16px; }
   }
 </style>
 </head>
@@ -883,6 +1013,59 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast">✓ Produto adicionado!</div>
+
+<!-- FAQ -->
+<button class="faq-btn" onclick="toggleFaq()" title="Dúvidas frequentes" aria-label="Abrir FAQ">?</button>
+
+<div class="faq-overlay" id="faqOverlay" onclick="closeFaq()"></div>
+
+<div class="faq-panel" id="faqPanel" role="dialog" aria-modal="true" aria-label="Perguntas frequentes">
+  <div class="faq-panel-header">
+    <div class="faq-panel-title">
+      Dúvidas frequentes
+      <small>Respostas rápidas para você</small>
+    </div>
+    <button class="faq-close-btn" onclick="closeFaq()" aria-label="Fechar">✕</button>
+  </div>
+
+  <div class="faq-body">
+    <div class="faq-item">
+      <div class="faq-question">Como funciona a personalização? Preciso enviar algum arquivo?</div>
+      <div class="faq-answer">É simples! Após o pedido, você nos envia as informações que deseja personalizar (nome, data, frase, logo) pelo WhatsApp. Nossa equipe cuida do design — não é necessário enviar arte pronta.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Aceita pedidos de última hora?</div>
+      <div class="faq-answer">Pedidos com pouca antecedência podem ser atendidos com os produtos disponíveis em estoque. Entre em contato antes de finalizar a compra para confirmar a disponibilidade.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Quais formas de pagamento são aceitas?</div>
+      <div class="faq-answer">Aceitamos Pix, débito e crédito. Parcelamentos no cartão estão sujeitos aos juros da operadora.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Preciso pagar antecipado?</div>
+      <div class="faq-answer">Sim. Por serem produtos personalizados, exigimos o pagamento antes da produção.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Vocês entregam para todo o Brasil?</div>
+      <div class="faq-answer">Sim! Enviamos para todo o Brasil via correios ou transportadora. O frete é calculado no momento do pedido.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Tem retirada local?</div>
+      <div class="faq-answer">Sim, oferecemos retirada presencial em Marília/SP. Combinaremos o local e horário após a confirmação do pedido.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">É possível incluir a identidade visual da empresa nos produtos?</div>
+      <div class="faq-answer">Sim! Trabalhamos com personalização corporativa. Basta nos enviar logo e as informações desejadas que desenvolvemos um produto alinhado à sua marca.</div>
+    </div>
+  </div>
+
+  <div class="faq-contact">
+    <p>Não encontrou sua dúvida?</p>
+    <a class="faq-contact-btn" href="https://wa.me/5514982097721" target="_blank" rel="noopener">
+      💬 Falar com a gente
+    </a>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -1578,6 +1761,24 @@ async function loadFromSupabase() {
 }
 
 window.addEventListener('load', loadFromSupabase);
+
+// =====================
+// FAQ
+// =====================
+function toggleFaq() {
+  const panel = document.getElementById('faqPanel');
+  const overlay = document.getElementById('faqOverlay');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+}
+
+function closeFaq() {
+  document.getElementById('faqPanel').classList.remove('open');
+  document.getElementById('faqOverlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFaq(); });
 </script>
 </body>
 </html>
