@@ -1395,13 +1395,13 @@ async function loadFromSupabase() {
     return;
   }
   try {
-    const { data, error } = await sb
+   const { data, error } = await sb
       .from('produtos')
-      .select('id, nome, categoria, descricao, icone, badge, ativo, imagem_url, variantes(id, label, preco, ordem)')
+      .select('*')
       .eq('ativo', true)
-      .order('categoria')
       .order('nome');
 
+    console.log('Dados brutos:', JSON.stringify(data?.[7]));
     if (error || !data || data.length === 0) {
       renderProducts('todos');
       return;
