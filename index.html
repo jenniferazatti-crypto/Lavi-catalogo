@@ -1397,7 +1397,7 @@ async function loadFromSupabase() {
   try {
     const { data, error } = await sb
       .from('produtos')
-      .select('*, variantes(id, label, preco, ordem)')
+      .select('id, nome, categoria, descricao, icone, badge, ativo, imagem_url, variantes(id, label, preco, ordem)')
       .eq('ativo', true)
       .order('categoria')
       .order('nome');
