@@ -854,26 +854,37 @@ async function deleteCategory(id) {
 }
 
 // =====================
-// CAMPANHAS
+// CAMPANHAS (múltiplas)
 // =====================
-async function loadActiveCampaign() {
-  const { data } = await sbClient.from('configuracoes').select('valor').eq('chave', 'campanha_ativa').maybeSingle();
-  const el = document.getElementById('campaignStatus');
+function parseCampanhas(valor) {
+  if (!valor) return [];
+  try {
+    const p = JSON.parse(valor);
+    return Array.isArray(p) ? p : (p ? [p] : []);
+  } catch(e) { return []; }
+}
 
-  if (data?.valor) {
-    let camp;
-    try { camp = JSON.parse(data.valor); } catch(e) { camp = { slug: data.valor, nome: data.valor }; }
-    el.innerHTML = `
-      <div class="campaign-active">Campanha ativa: <span>🌟 ${camp.nome}</span> <small style="color:var(--text-light);font-size:12px">(${camp.slug})</small></div>
-      <button class="btn-clear-camp" onclick="clearActiveCampaign()">✕ Desativar</button>
-    `;
-    document.getElementById('campSlug').value = camp.slug;
-    document.getElementById('campNome').value = camp.nome;
-  } else {
+async function loadActiveCampaign() {
+  const { data } = await sbClient.from('configuracoes').select('valor').eq('chave', 'campanhas_ativas').maybeSingle();
+  const el = document.getElementById('campaignStatus');
+  const campanhas = parseCampanhas(data?.valor);
+
+  if (campanhas.length === 0) {
     el.innerHTML = '<span class="campaign-active">Nenhuma campanha ativa no momento.</span>';
-    document.getElementById('campSlug').value = '';
-    document.getElementById('campNome').value = '';
+  } else {
+    const chips = campanhas.map(c => `
+      <div class="cat-tag">
+        <span>🌟 ${c.nome}</span>
+        <span style="font-size:11px;color:var(--text-light);margin-left:2px">(${c.slug})</span>
+        <button class="cat-tag-del" onclick="removeFromCampaigns('${c.slug}')" title="Desativar">✕</button>
+      </div>`).join('');
+    el.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;flex:1">${chips}</div>
+      <button class="btn-clear-camp" onclick="clearAllCampaigns()">✕ Desativar todas</button>
+    `;
   }
+  document.getElementById('campSlug').value = '';
+  document.getElementById('campNome').value = '';
 }
 
 async function saveActiveCampaign() {
@@ -881,18 +892,37 @@ async function saveActiveCampaign() {
   const nome = document.getElementById('campNome').value.trim();
   if (!slug || !nome) { showToast('Preencha o slug e o nome da campanha!', 'error'); return; }
 
-  const valor = JSON.stringify({ slug, nome });
+  const { data } = await sbClient.from('configuracoes').select('valor').eq('chave', 'campanhas_ativas').maybeSingle();
+  const campanhas = parseCampanhas(data?.valor);
+
+  if (campanhas.some(c => c.slug === slug)) {
+    showToast('Esta campanha já está ativa!', 'error'); return;
+  }
+  campanhas.push({ slug, nome });
+
   const { error } = await sbClient.from('configuracoes')
-    .upsert({ chave: 'campanha_ativa', valor }, { onConflict: 'chave' });
-  if (error) { showToast('Erro ao salvar campanha: ' + error.message, 'error'); return; }
-  showToast('✓ Campanha ativada!', 'success');
+    .upsert({ chave: 'campanhas_ativas', valor: JSON.stringify(campanhas) }, { onConflict: 'chave' });
+  if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+  showToast(`✓ "${nome}" ativada!`, 'success');
   await loadActiveCampaign();
 }
 
-async function clearActiveCampaign() {
-  const { error } = await sbClient.from('configuracoes').delete().eq('chave', 'campanha_ativa');
+async function removeFromCampaigns(slug) {
+  const { data } = await sbClient.from('configuracoes').select('valor').eq('chave', 'campanhas_ativas').maybeSingle();
+  const campanhas = parseCampanhas(data?.valor).filter(c => c.slug !== slug);
+  const { error } = await sbClient.from('configuracoes')
+    .upsert({ chave: 'campanhas_ativas', valor: JSON.stringify(campanhas) }, { onConflict: 'chave' });
   if (error) { showToast('Erro ao desativar campanha', 'error'); return; }
   showToast('✓ Campanha desativada', 'success');
+  await loadActiveCampaign();
+}
+
+async function clearAllCampaigns() {
+  if (!confirm('Desativar todas as campanhas?')) return;
+  const { error } = await sbClient.from('configuracoes')
+    .upsert({ chave: 'campanhas_ativas', valor: '[]' }, { onConflict: 'chave' });
+  if (error) { showToast('Erro ao desativar campanhas', 'error'); return; }
+  showToast('✓ Todas as campanhas desativadas', 'success');
   await loadActiveCampaign();
 }
 </script>

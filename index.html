@@ -1171,8 +1171,9 @@ function renderProducts(filter) {
   const title = document.getElementById('sectionTitle');
 
   let filtered;
-  if (filter === '__campanha__' && activeCampaign) {
-    filtered = products.filter(p => p.campaign === activeCampaign.slug);
+  if (filter.startsWith('__camp__:')) {
+    const slug = filter.slice(9);
+    filtered = products.filter(p => p.campaign === slug);
   } else if (filter === 'todos') {
     filtered = products;
   } else {
@@ -1182,8 +1183,9 @@ function renderProducts(filter) {
   const cats = getCategories();
   const catMap = {};
   cats.forEach(c => catMap[c.slug] = c.nome);
-  const nameMap = { 'todos': 'Todos os produtos', '__campanha__': activeCampaign ? activeCampaign.nome : 'Campanha' };
+  const nameMap = { 'todos': 'Todos os produtos' };
   cats.forEach(c => nameMap[c.slug] = c.nome);
+  activeCampaigns.forEach(c => nameMap[`__camp__:${c.slug}`] = `🌟 ${c.nome}`);
   title.textContent = `${nameMap[filter] || filter} (${filtered.length})`;
 
   if (filtered.length === 0) {
@@ -1429,7 +1431,7 @@ function showToast(msg) {
 // STATE — campanhas e categorias dinâmicas
 // =====================
 let products = [...products_fallback];
-let activeCampaign = null;  // { slug: 'dia-das-maes', nome: 'Dia das Mães' }
+let activeCampaigns = [];   // [{ slug: 'dia-das-maes', nome: 'Dia das Mães' }, ...]
 let dbCategories = [];
 
 const defaultCategories = [
@@ -1452,9 +1454,10 @@ function renderFilters() {
   const el = document.getElementById('filtersInner');
   const cats = getCategories();
   let html = `<button class="filter-btn ${currentFilter==='todos'?'active':''}" onclick="filterProducts('todos',this)">✨ Todos</button>`;
-  if (activeCampaign) {
-    html += `<button class="filter-btn campaign-filter-btn ${currentFilter==='__campanha__'?'active':''}" onclick="filterProducts('__campanha__',this)">🌟 ${activeCampaign.nome}</button>`;
-  }
+  activeCampaigns.forEach(c => {
+    const key = `__camp__:${c.slug}`;
+    html += `<button class="filter-btn campaign-filter-btn ${currentFilter===key?'active':''}" data-camp="${c.slug}" onclick="filterProducts('${key}',this)">🌟 ${c.nome}</button>`;
+  });
   cats.forEach(c => {
     html += `<button class="filter-btn ${currentFilter===c.slug?'active':''}" onclick="filterProducts('${c.slug}',this)">${c.icone} ${c.nome}</button>`;
   });
@@ -1464,10 +1467,26 @@ function renderFilters() {
 // =====================
 // BANNER DE CAMPANHA
 // =====================
+function filterCampaign(slug) {
+  const key = `__camp__:${slug}`;
+  filterProducts(key, document.querySelector(`[data-camp="${slug}"]`));
+}
+
 function renderCampaignBanner() {
   const banner = document.getElementById('campaignBanner');
-  if (!activeCampaign) { banner.style.display = 'none'; return; }
-  banner.innerHTML = `<div class="camp-inner">🌟 Campanha especial: <strong>${activeCampaign.nome}</strong>&nbsp;<button class="camp-btn" onclick="filterProducts('__campanha__', document.querySelector('.campaign-filter-btn'))">Ver produtos →</button></div>`;
+  if (activeCampaigns.length === 0) { banner.style.display = 'none'; return; }
+
+  let inner;
+  if (activeCampaigns.length === 1) {
+    const c = activeCampaigns[0];
+    inner = `🌟 Campanha especial: <strong>${c.nome}</strong>&nbsp;<button class="camp-btn" onclick="filterCampaign('${c.slug}')">Ver produtos →</button>`;
+  } else {
+    const btns = activeCampaigns.map(c =>
+      `<button class="camp-btn" onclick="filterCampaign('${c.slug}')">${c.nome}</button>`
+    ).join(' ');
+    inner = `🌟 Campanhas especiais: ${btns}`;
+  }
+  banner.innerHTML = `<div class="camp-inner">${inner}</div>`;
   banner.style.display = 'block';
 }
 
@@ -1487,11 +1506,13 @@ async function loadFromSupabase() {
       dbCategories = cats.map(c => ({ slug: c.slug, nome: c.nome, icone: c.icone || '🏷️' }));
     }
 
-    // Carrega campanha ativa
-    const { data: cfg } = await sb.from('configuracoes').select('valor').eq('chave', 'campanha_ativa').maybeSingle();
+    // Carrega campanhas ativas (array)
+    const { data: cfg } = await sb.from('configuracoes').select('valor').eq('chave', 'campanhas_ativas').maybeSingle();
     if (cfg?.valor) {
-      try { activeCampaign = JSON.parse(cfg.valor); }
-      catch(e) { activeCampaign = { slug: cfg.valor, nome: cfg.valor }; }
+      try {
+        const parsed = JSON.parse(cfg.valor);
+        activeCampaigns = Array.isArray(parsed) ? parsed : (parsed ? [parsed] : []);
+      } catch(e) { activeCampaigns = []; }
     }
 
     // Carrega produtos com variantes
