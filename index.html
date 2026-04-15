@@ -782,6 +782,59 @@
 
   footer strong { color: white; }
 
+  /* SEARCH BAR */
+  .search-row {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 24px 4px;
+  }
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    font-size: 14px;
+    color: var(--text-light);
+    pointer-events: none;
+    line-height: 1;
+  }
+  .catalog-search {
+    width: 100%;
+    padding: 9px 36px 9px 38px;
+    border: 1.5px solid rgba(201,132,122,0.25);
+    border-radius: 50px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bege);
+    outline: none;
+    transition: all 0.2s;
+  }
+  .catalog-search:focus {
+    border-color: var(--rose);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(201,132,122,0.1);
+  }
+  .catalog-search::placeholder { color: var(--text-light); }
+  .search-clear {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 15px;
+    padding: 4px 6px;
+    line-height: 1;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: none;
+  }
+  .search-clear:hover { color: var(--rose); background: rgba(201,132,122,0.1); }
+
   /* FAQ BUTTON */
   .faq-btn {
     position: fixed;
@@ -952,6 +1005,20 @@
 
 <!-- FILTERS -->
 <div class="filters-section">
+  <div class="search-row">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="catalog-search"
+        id="catalogSearch"
+        placeholder="Buscar produto..."
+        autocomplete="off"
+        oninput="handleSearch(this.value)"
+      >
+      <button class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Limpar busca">✕</button>
+    </div>
+  </div>
   <div class="filters-inner" id="filtersInner"></div>
 </div>
 
@@ -1342,6 +1409,7 @@ const products_fallback = [
 // =====================
 let cart = [];
 let currentFilter = 'todos';
+let searchQuery = '';
 let modalProduct = null;
 let selectedVariantIdx = 0;
 
@@ -1362,13 +1430,20 @@ function renderProducts(filter) {
     filtered = products.filter(p => p.category === filter);
   }
 
+  // Aplica busca textual por nome
+  if (searchQuery) {
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery));
+  }
+
   const cats = getCategories();
   const catMap = {};
   cats.forEach(c => catMap[c.slug] = c.nome);
   const nameMap = { 'todos': 'Todos os produtos' };
   cats.forEach(c => nameMap[c.slug] = c.nome);
   activeCampaigns.forEach(c => nameMap[`__camp__:${c.slug}`] = `🌟 ${c.nome}`);
-  title.textContent = `${nameMap[filter] || filter} (${filtered.length})`;
+  title.textContent = searchQuery
+    ? `Resultados para "${searchQuery}" (${filtered.length})`
+    : `${nameMap[filter] || filter} (${filtered.length})`;
 
   if (filtered.length === 0) {
     grid.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-light);grid-column:1/-1">Nenhum produto encontrado nesta categoria.</div>';
@@ -1758,6 +1833,22 @@ async function loadFromSupabase() {
     renderFilters();
     renderProducts('todos');
   }
+}
+
+// =====================
+// BUSCA
+// =====================
+function handleSearch(val) {
+  searchQuery = val.trim().toLowerCase();
+  document.getElementById('searchClear').style.display = searchQuery ? 'block' : 'none';
+  renderProducts(currentFilter);
+}
+
+function clearSearch() {
+  searchQuery = '';
+  document.getElementById('catalogSearch').value = '';
+  document.getElementById('searchClear').style.display = 'none';
+  renderProducts(currentFilter);
 }
 
 window.addEventListener('load', loadFromSupabase);
