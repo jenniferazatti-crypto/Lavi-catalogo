@@ -306,6 +306,9 @@
       <select class="filter-select" id="filterSelectCat" onchange="filterByCategoria(this.value)">
         <option value="">Todas as categorias</option>
       </select>
+      <select class="filter-select" id="filterSelectCamp" onchange="filterByCampanha(this.value)">
+        <option value="">Todas as campanhas</option>
+      </select>
       <button class="btn-add" onclick="openModal()">+ Novo Produto</button>
     </div>
 
@@ -451,6 +454,7 @@ let categories = [];
 let editingId = null;
 let filterText = '';
 let filterCat = '';
+let filterCamp = '';
 
 const defaultCategories = [
   { id: null, slug:'quadros',    nome:'Quadros & Fotos',    icone:'🖼️' },
@@ -531,6 +535,7 @@ async function loadProducts() {
   products = data || [];
   updateStats();
   renderTable();
+  loadCampaignFilter();
 }
 
 function updateStats() {
@@ -552,6 +557,7 @@ function renderTable() {
   let list = products;
   if (filterText) list = list.filter(p => p.nome.toLowerCase().includes(filterText.toLowerCase()));
   if (filterCat) list = list.filter(p => p.categoria === filterCat);
+  if (filterCamp) list = list.filter(p => (p.campanha || '') === filterCamp);
 
   if (list.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum produto encontrado.</td></tr>';
@@ -598,6 +604,21 @@ function renderTable() {
 
 function filterTable(val) { filterText = val; renderTable(); }
 function filterByCategoria(val) { filterCat = val; renderTable(); }
+function filterByCampanha(val) { filterCamp = val; renderTable(); }
+
+function loadCampaignFilter() {
+  const slugs = [...new Set(products.map(p => p.campanha).filter(Boolean))].sort();
+  const sel = document.getElementById('filterSelectCamp');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Todas as campanhas</option>';
+  slugs.forEach(slug => {
+    const opt = document.createElement('option');
+    opt.value = slug;
+    opt.textContent = slug;
+    sel.appendChild(opt);
+  });
+  if (slugs.includes(current)) sel.value = current;
+}
 
 // =====================
 // MODAL
