@@ -1421,18 +1421,16 @@ function renderProducts(filter) {
   const title = document.getElementById('sectionTitle');
 
   let filtered;
-  if (filter.startsWith('__camp__:')) {
+  if (searchQuery) {
+    // Busca em todos os produtos (ignora filtro de categoria/campanha ativo)
+    filtered = products.filter(matchesSearch);
+  } else if (filter.startsWith('__camp__:')) {
     const slug = filter.slice(9);
     filtered = products.filter(p => p.campaign === slug);
   } else if (filter === 'todos') {
     filtered = products;
   } else {
     filtered = products.filter(p => p.category === filter);
-  }
-
-  // Aplica busca textual por nome
-  if (searchQuery) {
-    filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery));
   }
 
   const cats = getCategories();
@@ -1838,8 +1836,21 @@ async function loadFromSupabase() {
 // =====================
 // BUSCA
 // =====================
+function normalizeText(str) {
+  return (str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''); // remove acentos
+}
+
+function matchesSearch(p) {
+  const q = normalizeText(searchQuery);
+  return normalizeText(p.name).includes(q) ||
+         normalizeText(p.campaign || '').includes(q);
+}
+
 function handleSearch(val) {
-  searchQuery = val.trim().toLowerCase();
+  searchQuery = val.trim(); // preserva original para exibição no título
   document.getElementById('searchClear').style.display = searchQuery ? 'block' : 'none';
   renderProducts(currentFilter);
 }
