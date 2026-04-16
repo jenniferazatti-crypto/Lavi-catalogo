@@ -865,7 +865,7 @@ async function addCategory() {
 
   if (!slug || !nome) { showToast('Preencha slug e nome da categoria!', 'error'); return; }
 
-  const { error } = await sbClient.from('categorias').insert({ slug, nome, emoji: icone, ordem: categories.length + 1 });
+  const { error } = await sbClient.from('categorias').insert({ slug, nome, emoji: icone });
   if (error) { showToast('Erro: ' + (error.message || 'slug já existe?'), 'error'); return; }
 
   document.getElementById('catSlug').value = '';
