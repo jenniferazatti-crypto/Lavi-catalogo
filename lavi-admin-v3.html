@@ -821,7 +821,7 @@ document.getElementById('modalOverlay').addEventListener('click', function(e) {
 // CATEGORIAS
 // =====================
 async function loadCategories() {
-  const { data, error } = await sbClient.from('categorias').select('*').order('ordem').order('nome');
+  const { data, error } = await sbClient.from('categorias').select('*').order('nome');
   if (error || !data) {
     categories = [...defaultCategories];
   } else {
