@@ -958,6 +958,74 @@
   }
   .faq-contact-btn:hover { background: #1EB854; transform: translateY(-1px); }
 
+  /* CATEGORY SECTIONS (home view) */
+  .category-section {
+    margin-bottom: 52px;
+  }
+
+  .category-section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .category-section-header .section-title {
+    margin-bottom: 0;
+    flex: 1;
+  }
+
+  .category-section-header .section-title::after {
+    display: none;
+  }
+
+  .ver-mais-btn {
+    white-space: nowrap;
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1.5px solid var(--rose);
+    background: transparent;
+    color: var(--rose);
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .ver-mais-btn:hover { background: var(--rose); color: white; }
+
+  /* FILTERED VIEW header */
+  .filtered-view-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .filtered-view-header .section-title {
+    margin-bottom: 0;
+    flex: 1;
+  }
+
+  .back-btn {
+    white-space: nowrap;
+    padding: 7px 16px;
+    border-radius: 50px;
+    border: 1.5px solid rgba(201,132,122,0.35);
+    background: transparent;
+    color: var(--text-light);
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .back-btn:hover { border-color: var(--rose); color: var(--rose); }
+
   /* RESPONSIVE */
   @media (max-width: 600px) {
     .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -1023,9 +1091,18 @@
 </div>
 
 <!-- PRODUCTS -->
-<section class="products-section">
-  <h2 class="section-title" id="sectionTitle">Todos os produtos</h2>
-  <div class="products-grid" id="productsGrid"></div>
+<section class="products-section" id="productsSection">
+  <!-- HOME VIEW: seções por categoria -->
+  <div id="homeView"></div>
+
+  <!-- FILTERED VIEW: grid filtrado -->
+  <div id="filteredView" style="display:none">
+    <div class="filtered-view-header">
+      <button class="back-btn" onclick="showHomeView()">← Início</button>
+      <h2 class="section-title" id="sectionTitle">Todos os produtos</h2>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+  </div>
 </section>
 
 <!-- FOOTER -->
@@ -1409,6 +1486,7 @@ const products_fallback = [
 // =====================
 let cart = [];
 let currentFilter = 'todos';
+let isHomeView = true;
 let searchQuery = '';
 let modalProduct = null;
 let selectedVariantIdx = 0;
@@ -1416,13 +1494,42 @@ let selectedVariantIdx = 0;
 // =====================
 // RENDER PRODUCTS
 // =====================
+function buildProductCard(p, catMap) {
+  const minPrice = p.variants.length ? Math.min(...p.variants.map(v=>v.price)) : 0;
+  const hasVariants = p.variants.length > 1;
+  return `
+    <div class="product-card" data-category="${p.category}">
+      <div class="product-img">
+        ${p.image
+          ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+          : `<span style="font-size:56px">${p.icon}</span>`
+        }
+        ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
+      </div>
+      <div class="product-body">
+        <div class="product-category">${catMap[p.category] || categoryName(p.category)}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-price-row">
+          <div>
+            ${hasVariants ? `<div class="product-price-from">A partir de</div>` : ''}
+            <div class="product-price">R$ ${minPrice.toFixed(2).replace('.',',')}</div>
+          </div>
+        </div>
+        <button class="add-btn" onclick="handleAddProduct(${p.id})">
+          ${hasVariants ? '+ Escolher opção' : '+ Adicionar'}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 function renderProducts(filter) {
   const grid = document.getElementById('productsGrid');
   const title = document.getElementById('sectionTitle');
 
   let filtered;
   if (searchQuery) {
-    // Busca em todos os produtos (ignora filtro de categoria/campanha ativo)
     filtered = products.filter(matchesSearch);
   } else if (filter.startsWith('__camp__:')) {
     const slug = filter.slice(9);
@@ -1448,35 +1555,60 @@ function renderProducts(filter) {
     return;
   }
 
-  grid.innerHTML = filtered.map(p => {
-    const minPrice = p.variants.length ? Math.min(...p.variants.map(v=>v.price)) : 0;
-    const hasVariants = p.variants.length > 1;
-    return `
-      <div class="product-card" data-category="${p.category}">
-      <div class="product-img">
-          ${p.image
-            ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
-            : `<span style="font-size:56px">${p.icon}</span>`
-          }
-          ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
-        </div>
-        <div class="product-body">
-          <div class="product-category">${catMap[p.category] || categoryName(p.category)}</div>
-          <div class="product-name">${p.name}</div>
-          <div class="product-desc">${p.desc}</div>
-          <div class="product-price-row">
-            <div>
-              ${hasVariants ? `<div class="product-price-from">A partir de</div>` : ''}
-              <div class="product-price">R$ ${minPrice.toFixed(2).replace('.',',')}</div>
-            </div>
-          </div>
-          <button class="add-btn" onclick="handleAddProduct(${p.id})">
-            ${hasVariants ? '+ Escolher opção' : '+ Adicionar'}
+  grid.innerHTML = filtered.map(p => buildProductCard(p, catMap)).join('');
+}
+
+// =====================
+// HOME VIEW — seções por categoria
+// =====================
+function renderHomeSections() {
+  const el = document.getElementById('homeView');
+  const cats = getCategories();
+  const catMap = {};
+  cats.forEach(c => catMap[c.slug] = c.nome);
+
+  let html = '';
+  cats.forEach(cat => {
+    const catProducts = products.filter(p => p.category === cat.slug);
+    if (catProducts.length === 0) return;
+
+    const featured = catProducts.slice(0, 4);
+
+    html += `
+      <div class="category-section">
+        <div class="category-section-header">
+          <h2 class="section-title">${cat.icone} ${cat.nome}</h2>
+          <button class="ver-mais-btn" onclick="filterProductsBySlug('${cat.slug}')">
+            Ver todos (${catProducts.length}) →
           </button>
+        </div>
+        <div class="products-grid">
+          ${featured.map(p => buildProductCard(p, catMap)).join('')}
         </div>
       </div>
     `;
-  }).join('');
+  });
+
+  el.innerHTML = html || '<div style="text-align:center;padding:60px;color:var(--text-light)">Nenhum produto disponível.</div>';
+}
+
+function showHomeView() {
+  currentFilter = 'todos';
+  isHomeView = true;
+  searchQuery = '';
+  document.getElementById('catalogSearch').value = '';
+  document.getElementById('searchClear').style.display = 'none';
+  document.getElementById('homeView').style.display = 'block';
+  document.getElementById('filteredView').style.display = 'none';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const todosBtn = document.querySelector('.filter-btn[data-todos]');
+  if (todosBtn) todosBtn.classList.add('active');
+}
+
+function filterProductsBySlug(slug) {
+  const btn = document.querySelector(`.filter-btn[data-slug="${slug}"]`);
+  filterProducts(slug, btn);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function categoryName(cat) {
@@ -1486,6 +1618,9 @@ function categoryName(cat) {
 
 function filterProducts(filter, btn) {
   currentFilter = filter;
+  isHomeView = false;
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('filteredView').style.display = 'block';
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderProducts(filter);
@@ -1716,7 +1851,7 @@ let dbCategories = [];
 const defaultCategories = [
   { slug:'quadros',    nome:'Quadros & Fotos',    icone:'🖼️' },
   { slug:'azulejos',   nome:'Azulejos',           icone:'🏠' },
-  { slug:'canecas',    nome:'Canecas & Bebidas',  icone:'☕' },
+  { slug:'canecas',    nome:'Canecas',            icone:'☕' },
   { slug:'utilidades', nome:'Utilidades',         icone:'🎁' },
   { slug:'lembrancas', nome:'Lembranças',         icone:'💝' },
   { slug:'chocolates', nome:'Chocolates & Cards', icone:'🍫' },
@@ -1732,13 +1867,13 @@ function getCategories() {
 function renderFilters() {
   const el = document.getElementById('filtersInner');
   const cats = getCategories();
-  let html = `<button class="filter-btn ${currentFilter==='todos'?'active':''}" onclick="filterProducts('todos',this)">✨ Todos</button>`;
+  let html = `<button class="filter-btn ${isHomeView?'active':''}" data-todos onclick="showHomeView()">✨ Todos</button>`;
   activeCampaigns.forEach(c => {
     const key = `__camp__:${c.slug}`;
-    html += `<button class="filter-btn campaign-filter-btn ${currentFilter===key?'active':''}" data-camp="${c.slug}" onclick="filterProducts('${key}',this)">🌟 ${c.nome}</button>`;
+    html += `<button class="filter-btn campaign-filter-btn ${!isHomeView&&currentFilter===key?'active':''}" data-camp="${c.slug}" onclick="filterProducts('${key}',this)">🌟 ${c.nome}</button>`;
   });
   cats.forEach(c => {
-    html += `<button class="filter-btn ${currentFilter===c.slug?'active':''}" onclick="filterProducts('${c.slug}',this)">${c.icone} ${c.nome}</button>`;
+    html += `<button class="filter-btn ${!isHomeView&&currentFilter===c.slug?'active':''}" data-slug="${c.slug}" onclick="filterProductsBySlug('${c.slug}')">${c.icone} ${c.nome}</button>`;
   });
   el.innerHTML = html;
 }
@@ -1775,7 +1910,7 @@ function renderCampaignBanner() {
 async function loadFromSupabase() {
   if (!sb) {
     renderFilters();
-    renderProducts('todos');
+    renderHomeSections();
     return;
   }
   try {
@@ -1804,7 +1939,7 @@ async function loadFromSupabase() {
     if (error || !data || data.length === 0) {
       renderFilters();
       renderCampaignBanner();
-      renderProducts('todos');
+      renderHomeSections();
       return;
     }
 
@@ -1825,11 +1960,11 @@ async function loadFromSupabase() {
 
     renderFilters();
     renderCampaignBanner();
-    renderProducts('todos');
+    renderHomeSections();
   } catch(e) {
     console.error('Erro Supabase:', e);
     renderFilters();
-    renderProducts('todos');
+    renderHomeSections();
   }
 }
 
@@ -1850,16 +1985,25 @@ function matchesSearch(p) {
 }
 
 function handleSearch(val) {
-  searchQuery = val.trim(); // preserva original para exibição no título
+  searchQuery = val.trim();
   document.getElementById('searchClear').style.display = searchQuery ? 'block' : 'none';
-  renderProducts(currentFilter);
+  if (searchQuery) {
+    // Busca sempre usa a view filtrada
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('filteredView').style.display = 'block';
+    isHomeView = false;
+    renderProducts(currentFilter);
+  } else {
+    // Sem texto → volta para home
+    showHomeView();
+  }
 }
 
 function clearSearch() {
   searchQuery = '';
   document.getElementById('catalogSearch').value = '';
   document.getElementById('searchClear').style.display = 'none';
-  renderProducts(currentFilter);
+  showHomeView();
 }
 
 window.addEventListener('load', loadFromSupabase);
