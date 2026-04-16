@@ -1780,9 +1780,9 @@ async function loadFromSupabase() {
   }
   try {
     // Carrega categorias do banco
-    const { data: cats } = await sb.from('categorias').select('*').order('ordem').order('nome');
+    const { data: cats } = await sb.from('categorias').select('*').order('nome');
     if (cats && cats.length > 0) {
-      dbCategories = cats.map(c => ({ slug: c.slug, nome: c.nome, icone: c.icone || '🏷️' }));
+      dbCategories = cats.map(c => ({ slug: c.slug, nome: c.nome, icone: c.emoji || '🏷️' }));
     }
 
     // Carrega campanhas ativas (array)
