@@ -309,6 +309,11 @@
       <select class="filter-select" id="filterSelectCamp" onchange="filterByCampanha(this.value)">
         <option value="">Todas as campanhas</option>
       </select>
+      <select class="filter-select" id="filterSelectStatus" onchange="filterByStatus(this.value)">
+        <option value="">Todos</option>
+        <option value="ativo">Ativos</option>
+        <option value="inativo">Desativados</option>
+      </select>
       <button class="btn-add" onclick="openModal()">+ Novo Produto</button>
     </div>
 
@@ -455,6 +460,7 @@ let editingId = null;
 let filterText = '';
 let filterCat = '';
 let filterCamp = '';
+let filterStatus = '';
 
 const defaultCategories = [
   { id: null, slug:'quadros',    nome:'Quadros & Fotos',    icone:'🖼️' },
@@ -558,6 +564,8 @@ function renderTable() {
   if (filterText) list = list.filter(p => p.nome.toLowerCase().includes(filterText.toLowerCase()));
   if (filterCat) list = list.filter(p => p.categoria === filterCat);
   if (filterCamp) list = list.filter(p => (p.campanha || '') === filterCamp);
+  if (filterStatus === 'ativo') list = list.filter(p => p.ativo);
+  else if (filterStatus === 'inativo') list = list.filter(p => !p.ativo);
 
   if (list.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum produto encontrado.</td></tr>';
@@ -605,6 +613,7 @@ function renderTable() {
 function filterTable(val) { filterText = val; renderTable(); }
 function filterByCategoria(val) { filterCat = val; renderTable(); }
 function filterByCampanha(val) { filterCamp = val; renderTable(); }
+function filterByStatus(val) { filterStatus = val; renderTable(); }
 
 function loadCampaignFilter() {
   const slugs = [...new Set(products.map(p => p.campanha).filter(Boolean))].sort();
